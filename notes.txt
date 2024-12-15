@@ -1,0 +1,25 @@
+Steps to setup the project
+
+Step 1: First create a virtual env file:
+        python -m venv venv
+
+Step 2: Activate virtual env in windows:
+        venv/Scripts/activate
+        
+        For Ubuntu/linux:
+        source venv/bin/activate
+
+Step 3: Run the below commond to install the packages
+        pip install -r requirements.txt
+
+        below packages will get installed:
+        1. pip install pandas
+        2. pip install fake-useragent
+        3. pip install selenium
+
+Step 4: Run the script:
+        python email_script.py
+
+** To Make requirements.txt file run below commond:
+   pip freeze > requirements.txt
+
