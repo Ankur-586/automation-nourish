@@ -23,7 +23,10 @@ Step 4: Run the script:
 ** To Make requirements.txt file run below commond:
    pip freeze > requirements.txt
 
+Docs: https://selenium-python.readthedocs.io/waits.html
+
 -----------------------------------
+---------
 Packages:
 ---------
 pip install selenium
