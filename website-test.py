@@ -1,31 +1,37 @@
 from settings.config import WebDriverSetup, logger
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 import time
 
 def addProductfromSearchbar():
     # Create WebDriverSetup instance
     web_driver_setup = WebDriverSetup(headless=False)  # or True for headless mode
-    
-    # Get WebDriver
+
     driver = web_driver_setup.setup_driver()
 
     driver.get("https://nourishstore.in/")
     
-    search_bar_click = driver.find_element(By.XPATH, '/html/body/header/nav/div[3]')  
+    search_bar_click = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, '/html/body/header/nav/div[3]'))
+    )
     search_bar_click.click()
+
     time.sleep(5)
-    text_input = driver.find_element(By.XPATH, '//*[@id="autocompleteInput"]')
+
+    text_input = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
+    )
     text_input.send_keys('arhar')
-    time.sleep(5)
-    fetch_product_text = driver.find_element(By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]')
-    print(fetch_product_text.text)
-    if 
+
+    fetch_product_text = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
+    )
+    logger.info(fetch_product_text.text)
     logger.info('Search bar clicked')
-    time.sleep(5)
     
-    # Close the driver when done
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
