@@ -1,10 +1,12 @@
-from settings.config import WebDriverSetup, logger
+from settings.config import WebDriverSetup
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-import time
+import time, logging
+
+logger = logging.getLogger(__name__)
 
 def addProductfromSearchbar():
     # Create WebDriverSetup instance
@@ -14,18 +16,22 @@ def addProductfromSearchbar():
 
     driver.get("https://nourishstore.in/")
     
-    search_bar_click = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, '/html/body/header/nav/div[3]'))
-    )
-    search_bar_click.click()
+    try:
+        search_bar_click = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[3]'))
+        )
+        search_bar_click.click() 
+    except Exception as e:
+        logger.error(f'Search Bar Exception: {e}')
 
-    time.sleep(5)
-
-    text_input = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
-    )
-    text_input.send_keys('arhar')
-
+    try:
+        text_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
+        )
+        text_input.send_keys('arhar')
+    except Exception as e:
+        logger.error(f'Search Bar Exception: {e}')
+        
     fetch_product_text = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
     )
@@ -38,6 +44,8 @@ if __name__ == "__main__":
     addProductfromSearchbar()
     
 '''
+presence_of_element_located
+
 inspite of using time.sleep now and then after every element. whta other option dpo i have
 
 def addProductfromSearchbar():
