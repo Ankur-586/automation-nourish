@@ -70,7 +70,9 @@ def setup_logging():
     except Exception as e:
         print(f"Error loading logging configuration: {e}")
 
-logger = logging.getLogger(__name__)
+general_logger = logging.getLogger('root')
+exception_logger = logging.getLogger('exception_logger')
+selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
 setup_logging()
 log_separator()  
 

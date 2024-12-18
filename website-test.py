@@ -1,4 +1,5 @@
-from settings.config import WebDriverSetup, logger
+from settings.config import WebDriverSetup
+from settings.log_setup import general_logger, exception_logger
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -6,28 +7,28 @@ from selenium.webdriver.support import expected_conditions as EC
 
 import time, logging
 
-# logger = logging.getLogger("root")
-# exception_logger = logging.getLogger("exception_logger")
+# general_logger = logging.getgeneral_logger("root")
+# exception_general_logger = logging.getgeneral_logger("exception_general_logger")
 
 def addProductfromSearchbar():
     # Start logging the process
-    logger.info("Starting addProductfromSearchbar function.")
+    general_logger.info("Starting addProductfromSearchbar function.")
     
     # Create WebDriverSetup instance
     try:
         web_driver_setup = WebDriverSetup(headless=False)  # Change to True for headless mode
         driver = web_driver_setup.setup_driver()
-        logger.info("WebDriver initialized successfully.")
+        general_logger.info("WebDriver initialized successfully.")
     except Exception as e:
-        logger.error(f"Error initializing WebDriver: {e}")
+        exception_logger.error(f"Error initializing WebDriver: {e}")
         return
 
     # Open the website
     try:
         driver.get("https://nourishstore.in/")
-        logger.info("Navigated to nourishstore.in.")
+        general_logger.info("Navigated to nourishstore.in.")
     except Exception as e:
-        logger.error(f"Error loading website: {e}")
+        exception_logger.error(f"Error loading website: {e}")
         driver.quit()
         return
 
@@ -37,9 +38,9 @@ def addProductfromSearchbar():
             EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[3]'))
         )
         search_bar_click.click()
-        logger.info("Search bar clicked.")
+        general_logger.info("Search bar clicked.")
     except Exception as e:
-        logger.error(f"Search Bar Exception: {e}")
+        exception_logger.error(f"Search Bar Exception: {e}")
         driver.quit()
         return
 
@@ -51,9 +52,9 @@ def addProductfromSearchbar():
             EC.presence_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
         )
         text_input.send_keys('arhar')
-        logger.info("Search term 'arhar' entered in the search bar.")
+        general_logger.info("Search term 'arhar' entered in the search bar.")
     except Exception as e:
-        logger.error(f"Error entering text in the search bar: {e}")
+        exception_logger.error(f"Error entering text in the search bar: {e}")
         driver.quit()
         return
 
@@ -62,14 +63,14 @@ def addProductfromSearchbar():
         fetch_product_text = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
         )
-        logger.info(f"Fetched product: {fetch_product_text.text}")
+        general_logger.info(f"Fetched product: {fetch_product_text.text}")
     except Exception as e:
-        logger.error(f"Error fetching product text: {e}")
+        exception_logger.error(f"Error fetching product text: {e}")
         driver.quit()
         return
 
     # Log that everything was successful
-    logger.info("Product search from search bar completed successfully.")
+    general_logger.info("Product search from search bar completed successfully.")
 
     
     web_driver_setup.close_driver()

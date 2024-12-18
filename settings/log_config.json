@@ -20,7 +20,7 @@
         "exception_file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "ERROR",
-            "formatter": "simple",
+            "formatter": "json",
             "filename": "logs/exceptions/exceptions.log",
             "maxBytes": 10485760,
             "backupCount": 3,
@@ -29,7 +29,7 @@
         "selenium_error_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "ERROR",
-            "formatter": "simple",
+            "formatter": "json",
             "filename": "logs/selenium_errors/selenium_errors.log",
             "maxBytes": 10485760,
             "backupCount": 3,
@@ -47,6 +47,20 @@
             "level": "ERROR",
             "handlers": [
                 "exception_file_handler"
+            ],
+            "propagate": false
+        },
+        "selenium.webdriver.common.service": {
+            "level": "ERROR",  
+            "handlers": [
+                "selenium_error_handler"
+            ],
+            "propagate": false
+        },
+        "selenium.webdriver.common.selenium_manager": {
+            "level": "ERROR",  
+            "handlers": [
+                "selenium_error_handler"
             ],
             "propagate": false
         },
