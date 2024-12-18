@@ -70,8 +70,8 @@ def setup_logging():
     except Exception as e:
         print(f"Error loading logging configuration: {e}")
 
-setup_logging()
 logger = logging.getLogger(__name__)
+setup_logging()
 log_separator()  
 
 '''

@@ -1,9 +1,14 @@
+import logging
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 from settings.log_setup import logger
 
 from fake_useragent import UserAgent
+
+# logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+# print(logger)
 
 class WebDriverSetup:
     
@@ -17,6 +22,7 @@ class WebDriverSetup:
         try:
             ua = UserAgent()
             return ua.random
+            ddfdgf
         except Exception as e:
             logger.error(f"Error generating User-Agent: {e}")
     
