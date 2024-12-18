@@ -3,34 +3,28 @@ import pathlib
 import json
 import logging.config
 
-# Function to ensure the existence of the log folders and their respective log files
 def ensure_log_folders():
-    # Define the base 'logs' directory and its subdirectories
+    '''
+    This function ensure the existence of the log folders and their respective log files
+    '''
     log_dir = pathlib.Path('logs')
     print('fagaga',log_dir)
-    subdirs = ['general', 'exceptions', 'selenium_errors']
-
+    subdirs = ['general', 'exceptions', 'selenium']
     # Create the base 'logs' directory if it doesn't exist
     if not log_dir.exists():
         log_dir.mkdir(parents=True, exist_ok=True)
         print(f"Created 'logs' directory.")
-
     # Create subdirectories and corresponding log files
     for subdir in subdirs:
         subdir_path = log_dir / subdir
         if not subdir_path.exists():
             subdir_path.mkdir(parents=True, exist_ok=True)  # Create the subdirectory if it doesn't exist
             print(f"Created folder: {subdir_path}")
-        
-        # Define the log file path for each subdirectory
-        log_file_path = subdir_path / f"{subdir}.log"
-        if not log_file_path.exists():
-            log_file_path.touch()  # Create the empty log file
-            print(f"Created log file: {log_file_path}")
 
 def log_separator():
     separator_logger = logging.getLogger('separator_logger')
     separator_handler = logging.FileHandler('logs/general/general.log')
+    separator_handler = logging.FileHandler('logs/selenium/selenium_general.log')
     separator_handler.setFormatter(logging.Formatter('%(message)s'))
     separator_logger.addHandler(separator_handler)
     separator_logger.propagate = False
@@ -72,7 +66,9 @@ def setup_logging():
 
 general_logger = logging.getLogger('root')
 exception_logger = logging.getLogger('exception_logger')
-selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+#selenium_logger = logging.getLogger('selenium_logger')
+#selenium_error_logger = logging.getLogger('selenium_error_logger')
+
 setup_logging()
 log_separator()  
 

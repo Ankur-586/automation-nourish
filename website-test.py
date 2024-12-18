@@ -5,10 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-import time, logging
-
-# general_logger = logging.getgeneral_logger("root")
-# exception_general_logger = logging.getgeneral_logger("exception_general_logger")
+import time
 
 def addProductfromSearchbar():
     # Start logging the process

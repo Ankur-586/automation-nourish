@@ -1,11 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from settings.log_setup import exception_logger, selenium_logger, general_logger
+from settings.log_setup import exception_logger, general_logger
 
 from fake_useragent import UserAgent
 
-# print(logger)
 
 class WebDriverSetup:
     
