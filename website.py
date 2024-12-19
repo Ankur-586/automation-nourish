@@ -8,12 +8,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 
 def addProductfromSearchbar():
-    # Start logging the process
-    general_logger.info("Starting addProductfromSearchbar function.")
-    
-    # Create WebDriverSetup instance
     try:
-        web_driver_setup = WebDriverSetup(headless=False)  # Change to True for headless mode
+        web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
         driver = web_driver_setup.setup_driver()
         general_logger.info("WebDriver initialized successfully.")
     except Exception as e:

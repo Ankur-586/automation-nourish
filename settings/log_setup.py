@@ -8,7 +8,6 @@ def ensure_log_folders():
     This function ensure the existence of the log folders and their respective log files
     '''
     log_dir = pathlib.Path('logs')
-    print('fagaga',log_dir)
     subdirs = ['general', 'exceptions', 'selenium']
     # Create the base 'logs' directory if it doesn't exist
     if not log_dir.exists():
@@ -25,6 +24,7 @@ def log_separator():
     separator_logger = logging.getLogger('separator_logger')
     separator_handler = logging.FileHandler('logs/general/general.log')
     separator_handler = logging.FileHandler('logs/selenium/selenium_general.log')
+    separator_handler = logging.FileHandler('logs/exceptions/app_exceptions.log')
     separator_handler.setFormatter(logging.Formatter('%(message)s'))
     separator_logger.addHandler(separator_handler)
     separator_logger.propagate = False
@@ -37,24 +37,19 @@ def log_separator():
     separator_handler.close()
 
 def setup_logging():
-   
     # Ensure log folders and files exist
     ensure_log_folders()
-    
     # Ensure the 'settings' folder exists
     settings_folder = pathlib.Path('settings')
     if not settings_folder.exists():
         print(f"Error: The 'settings' directory does not exist. Please create it.")
         return 
-    
     # Path to your logging config file (ensure this is correct)
     config_file = settings_folder / 'log_config.json'
-
     # Check if the config file exists
     if not config_file.exists():
         print(f"Error: Logging configuration file '{config_file}' does not exist.")
         return
-
     # Load the logging configuration from the JSON file
     try:
         with open(config_file, "r") as f:
@@ -66,8 +61,6 @@ def setup_logging():
 
 general_logger = logging.getLogger('root')
 exception_logger = logging.getLogger('exception_logger')
-#selenium_logger = logging.getLogger('selenium_logger')
-#selenium_error_logger = logging.getLogger('selenium_error_logger')
 
 setup_logging()
 log_separator()  
