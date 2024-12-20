@@ -1,6 +1,4 @@
-import logging
-import pathlib
-import json
+import logging, pathlib, json, time
 import logging.config
 
 def ensure_log_folders():
@@ -21,20 +19,51 @@ def ensure_log_folders():
             print(f"Created folder: {subdir_path}")
 
 def log_separator():
+    '''
+    This function writes a separator to only the log files that have been modified recently or are non-empty.
+    '''
+    log_dir = pathlib.Path('logs')
+    # Create a list of all log files in the subdirectories
+    log_files = []
+    for subdir in log_dir.iterdir():
+        if subdir.is_dir():  # Check if it's a subdirectory
+            for log_file in subdir.glob('*.log'):  # Find all .log files in the subdir
+                log_files.append(log_file)
+    if not log_files:
+        print("No log files found to add a separator.")
+        return
+    # Set up a logger to write the separator
     separator_logger = logging.getLogger('separator_logger')
-    separator_handler = logging.FileHandler('logs/general/general.log')
-    separator_handler = logging.FileHandler('logs/selenium/selenium_general.log')
-    separator_handler = logging.FileHandler('logs/exceptions/app_exceptions.log')
-    separator_handler.setFormatter(logging.Formatter('%(message)s'))
-    separator_logger.addHandler(separator_handler)
-    separator_logger.propagate = False
-    separator_logger.setLevel(logging.DEBUG)
-
+    separator_logger.setLevel(logging.DEBUG)  # Set the level to DEBUG
+    # Define a formatter for the separator
+    formatter = logging.Formatter('%(message)s')
+    # Add a handler for each log file dynamically (but only for used/modified files)
+    handlers = []
+    for log_file in log_files:
+        if log_file.stat().st_size > 0:  # Only proceed if the file is non-empty
+            handler = logging.FileHandler(log_file)
+            handler.setFormatter(formatter)
+            handlers.append(handler)
+            separator_logger.addHandler(handler)
+        else:
+            # If the file is empty, check its modification time and log only if it's recently modified
+            last_modified_time = log_file.stat().st_mtime
+            # You can adjust the threshold for "recently modified" (e.g., 3 days ago)
+            if (time.time() - last_modified_time) < 3 * 24 * 60 * 60:  # 3 days in seconds
+                handler = logging.FileHandler(log_file)
+                handler.setFormatter(formatter)
+                handlers.append(handler)
+                separator_logger.addHandler(handler)
+    separator_logger.propagate = False  # Don't propagate to the root logger
+    # Define the separator string
     separator = "=============================================================================================================="
+    # Log the separator to each handler
     separator_logger.debug(separator)
-
-    separator_logger.removeHandler(separator_handler)
-    separator_handler.close()
+    # Remove handlers after logging to prevent duplicate log entries
+    for handler in handlers:
+        separator_logger.removeHandler(handler)
+        handler.close()
+    print(f"Separator logged to {len(handlers)} log files.")
 
 def setup_logging():
     # Ensure log folders and files exist

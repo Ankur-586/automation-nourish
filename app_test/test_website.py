@@ -5,9 +5,9 @@ from website import addProductfromSearchbar
 
 class TestAddProductFromSearchbar(unittest.TestCase):
 
-    @patch('src.product_operations.WebDriverSetup')  # Mock WebDriverSetup
-    @patch('src.product_operations.general_logger')  # Mock logger
-    @patch('src.product_operations.exception_logger')  # Mock exception logger
+    @patch('settings.config.WebDriverSetup.setup_driver')  # Mock WebDriverSetup
+    @patch('settings.log_setup.general_logger')  # Mock logger
+    @patch('settings.log_setup.exception_logger')  # Mock exception logger
     def test_add_product_from_searchbar(self, mock_exception_logger, mock_general_logger, MockWebDriverSetup):
         # Create a mock driver
         mock_driver = MagicMock()

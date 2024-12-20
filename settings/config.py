@@ -1,3 +1,5 @@
+import os
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -39,10 +41,12 @@ class WebDriverSetup:
         chrome_options.add_argument("start-maximized")
         
         # Setup path for ChromeDriver dynamically from an environment variable (optional)
-        # chrome_driver_path = os.getenv('CHROME_DRIVER_PATH', '/path/to/chromedriver')  # Update the default path
-        # if not os.path.exists(chrome_driver_path):
-        #     logger.error(f"ChromeDriver not found at {chrome_driver_path}")
-        #     raise FileNotFoundError(f"ChromeDriver not found at {chrome_driver_path}")
+        # self.driver = webdriver.Chrome(executable_path=chrome_driver_path,options=chrome_options)
+        chrome_driver_path = os.getenv('CHROME_DRIVER_PATH', r'C:\Users\Leads\.cache\selenium\chromedriver\win64\131.0.6778.204')  # Update the default path
+        print(chrome_driver_path)
+        if not os.path.exists(chrome_driver_path):
+            exception_logger.error(f"ChromeDriver not found at {chrome_driver_path}")
+            raise FileNotFoundError(f"ChromeDriver not found at {chrome_driver_path}")
         
         # Initialize WebDriver
         try:

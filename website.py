@@ -56,6 +56,8 @@ def addProductfromSearchbar():
         fetch_product_text = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
         )
+        fetch_product_text.click()
+        time.sleep(10)
         general_logger.info(f"Fetched product: {fetch_product_text.text}")
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
@@ -65,7 +67,6 @@ def addProductfromSearchbar():
     # Log that everything was successful
     general_logger.info("Product search from search bar completed successfully.")
 
-    
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
