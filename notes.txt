@@ -23,6 +23,10 @@ Step 4: Run the script:
 ** To Make requirements.txt file run below commond:
    pip freeze > requirements.txt
 
+optional_step: can also create workflow settings for current.
+steps1: ctrl + shift + p: opens Preferences: Open Workspace Settings (JSON)
+AND a work flow is created.
+
 Docs: https://selenium-python.readthedocs.io/waits.html
 
 -----------------------------------
@@ -33,7 +37,8 @@ pip install selenium
 pip install fake-useragent
 -----------------------------------
 
-i ma developing a automation script for automating webisite testing. 
+i am developing a automation script for automating webisite testing. 
 i want is after developing the scripts and after deployment. I want 
-that if i write test cases and deply them then the testing should 
-happend according to it.
+that if i write test cases and deploy them then the testing should 
+happend according to it and automatically.
+
