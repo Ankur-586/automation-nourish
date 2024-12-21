@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 import time
 
-def addProductfromSearchbar():
+def AddProductFromSearchbar():
     try:
         web_driver_setup = WebDriverSetup(headless=False)  # Change to True for headless mode
         driver = web_driver_setup.setup_driver()
@@ -56,21 +56,30 @@ def addProductfromSearchbar():
         fetch_product_text = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
         )
-        fetch_product_text.click()
-        time.sleep(10)
+        fetch_product_text
         general_logger.info(f"Fetched product: {fetch_product_text.text}")
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
         driver.quit()
         return
-
+    
+    try:
+        fetch_product_text.click()
+        time.sleep(5)
+        expected_product_page_url = 'https://nourishstore.in/unpolished-dal/arhar-dal'
+        actual_product_page_url = driver.current_url
+        if expected_product_page_url == actual_product_page_url:
+            print('success')
+    except Exception as e:
+        exception_logger.error(f"Error: {e}")
+    
     # Log that everything was successful
     general_logger.info("Product search from search bar completed successfully.")
 
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    addProductfromSearchbar()
+    AddProductFromSearchbar()
     
 '''
 presence_of_element_located
