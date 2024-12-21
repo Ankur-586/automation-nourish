@@ -7,9 +7,13 @@ from selenium.webdriver.support import expected_conditions as EC
 
 import time
 
-def AddProductFromSearchbar():
+def AddProductFromSearchbar(product_name: str):
+    if isinstance(product_name, str) is False:
+        exception_logger.error("Product name should be a string.")
+        return
+
     try:
-        web_driver_setup = WebDriverSetup(headless=False)  # Change to True for headless mode
+        web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
         driver = web_driver_setup.setup_driver()
         general_logger.info("WebDriver initialized successfully.")
     except Exception as e:
@@ -44,8 +48,8 @@ def AddProductFromSearchbar():
         text_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
         )
-        text_input.send_keys('arhar')
-        general_logger.info("Search term 'arhar' entered in the search bar.")
+        text_input.send_keys(product_name)
+        general_logger.info(f"Search term {product_name} entered in the search bar.")
     except Exception as e:
         exception_logger.error(f"Error entering text in the search bar: {e}")
         driver.quit()
@@ -56,22 +60,24 @@ def AddProductFromSearchbar():
         fetch_product_text = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
         )
-        fetch_product_text
         general_logger.info(f"Fetched product: {fetch_product_text.text}")
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
         driver.quit()
         return
     
+    # Click on the product to open the product page
     try:
         fetch_product_text.click()
         time.sleep(5)
         expected_product_page_url = 'https://nourishstore.in/unpolished-dal/arhar-dal'
         actual_product_page_url = driver.current_url
         if expected_product_page_url == actual_product_page_url:
-            print('success')
+            general_logger.info("Product page opened successfully")
+        else:
+            exception_logger.error("Product page did not open successfully")
     except Exception as e:
-        exception_logger.error(f"Error: {e}")
+        exception_logger.error(f"Error opening product page: {e}")
     
     # Log that everything was successful
     general_logger.info("Product search from search bar completed successfully.")
@@ -79,43 +85,5 @@ def AddProductFromSearchbar():
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    AddProductFromSearchbar()
+    AddProductFromSearchbar(69)
     
-'''
-presence_of_element_located
-
-inspite of using time.sleep now and then after every element. whta other option dpo i have
-
-def addProductfromSearchbar():
-    # Create WebDriverSetup instance
-    web_driver_setup = WebDriverSetup(headless=False)  # or True for headless mode
-    
-    # Get WebDriver
-    driver = web_driver_setup.setup_driver()
-
-    driver.get("https://nourishstore.in/")
-
-    # Wait until the search bar is clickable and click it
-    search_bar_click = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, '/html/body/header/nav/div[3]'))
-    )
-    search_bar_click.click()
-    
-    # Wait until the text input is visible and send 'arhar' text
-    text_input = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
-    )
-    text_input.send_keys('arhar')
-    
-    # Wait for the product text to become visible
-    fetch_product_text = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
-    )
-    print(fetch_product_text.text)
-
-    # Log message after the search bar is clicked
-    logger.info('Search bar clicked')
-
-    # Close the driver when done
-    web_driver_setup.close_driver()
-'''

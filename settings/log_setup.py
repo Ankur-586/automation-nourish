@@ -1,7 +1,5 @@
 import logging, pathlib, json, time
 import logging.config
-
-# from settings.log_seperator import log_separator
  
 def ensure_log_folders():
     '''
@@ -12,30 +10,11 @@ def ensure_log_folders():
     # Create the base 'logs' directory if it doesn't exist
     if not log_dir.exists():
         log_dir.mkdir(parents=True, exist_ok=True)
-        print(f"Created 'logs' directory.")
     # Create subdirectories and corresponding log files
     for subdir in subdirs:
         subdir_path = log_dir / subdir
         if not subdir_path.exists():
             subdir_path.mkdir(parents=True, exist_ok=True)  # Create the subdirectory if it doesn't exist
-            print(f"Created folder: {subdir_path}")
-
-class SeparatorLogHandler(logging.Handler):
-    def __init__(self, log_file):
-        super().__init__()
-        self.log_file = log_file
-
-    def emit(self, record):
-        # Check if the file is non-empty or modified recently
-        if self.log_file.stat().st_size > 0:  # Non-empty file
-            separator = "=============================================================================================================="
-            with open(self.log_file, 'a') as f:
-                f.write(f"{separator}\n")  # Add the separator before writing the log
-
-        # Proceed with the regular log writing
-        with open(self.log_file, 'a') as f:
-            f.write(self.format(record) + "\n")
-
 
 def log_separator():
     '''
@@ -45,6 +24,7 @@ def log_separator():
     log_dir = pathlib.Path('logs')
     # Create a list of all log files in the subdirectories
     log_files = []
+    # Find all .log files in the subdirectories
     for subdir in log_dir.iterdir():
         if subdir.is_dir():  # Check if it's a subdirectory
             for log_file in subdir.glob('*.log'):  # Find all .log files in the subdir
@@ -52,24 +32,15 @@ def log_separator():
     if not log_files:
         print("No log files found to add a separator.")
         return
-    # Set up a logger to write the separator
-    separator_logger = logging.getLogger('separator_logger')
-    separator_logger.setLevel(logging.DEBUG)  # Set the level to DEBUG
-    # Define a formatter for the separator (if any)
-    formatter = logging.Formatter('%(message)s')
-    # Add the custom handler to each log file
+    # Separator line to add
+    separator = "=============================================================================================================="
+    # Loop through all the log files and add separator if necessary
     for log_file in log_files:
-        if log_file.stat().st_size > 0 or (time.time() - log_file.stat().st_mtime) < 3 * 24 * 60 * 60:  # 3 days threshold for recently modified
-            handler = SeparatorLogHandler(log_file)
-            handler.setFormatter(formatter)
-            separator_logger.addHandler(handler)
-    # Write a test log that will trigger the separator
-    # separator_logger.debug("This is a log entry triggering the separator.")
-    # Clean up handlers after logging to avoid duplicate entries
-    for handler in separator_logger.handlers:
-        separator_logger.removeHandler(handler)
-        handler.close()
-    print("Separator triggered in log files.")
+        # Check if the log file is non-empty or recently modified
+        if log_file.stat().st_size > 0 or (time.time() - log_file.stat().st_mtime) < 3 * 24 * 60 * 60:  # Recently modified (3 days)
+            # Open the log file and add a separator before writing a log
+            with open(log_file, 'a') as f:
+                f.write(f"{separator}\n")  # Add separator
 
 def setup_logging():
     # Ensure log folders and files exist
@@ -90,7 +61,6 @@ def setup_logging():
         with open(config_file, "r") as f:
             config = json.load(f)
         logging.config.dictConfig(config)  # Apply logging configuration
-        print("Logging configuration loaded successfully.")
     except Exception as e:
         print(f"Error loading logging configuration: {e}")
 
