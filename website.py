@@ -74,10 +74,17 @@ def AddProductFromSearchbar(product_name: str):
         actual_product_page_url = driver.current_url
         if expected_product_page_url == actual_product_page_url:
             general_logger.info("Product page opened successfully")
-        else:
-            exception_logger.error("Product page did not open successfully")
+            return 'Pass'
+        exception_logger.error("Product page did not open successfully")
+        return 'Fail'
     except Exception as e:
         exception_logger.error(f"Error opening product page: {e}")
+    
+    try:
+        product_name = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1')
+        general_logger.info(f"Product name: {product_name}")
+    except Exception as e:
+        exception_logger.error(f"Error fetching product name: {e}")
     
     # Log that everything was successful
     general_logger.info("Product search from search bar completed successfully.")
@@ -85,5 +92,5 @@ def AddProductFromSearchbar(product_name: str):
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    AddProductFromSearchbar(69)
+    AddProductFromSearchbar('arhar')
     
