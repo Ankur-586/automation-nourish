@@ -3,69 +3,53 @@ import logging.config
 
 # from settings.log_seperator import log_separator
 
+
 def ensure_log_folders():
-    '''
-    This function ensure the existence of the log folders and their respective log files/
-    parents=True: Ensures that any missing parent directories are also created (if needed).
-    exist_ok=True: If the directory already exists, it will not raise an error (i.e., it will silently succeed).
-    '''
+    """Ensures the existence of log folders."""
     log_dir = pathlib.Path('logs')
     subdirs = ['general', 'exceptions', 'selenium']
-    # Create the base 'logs' directory if it doesn't exist
-    if not log_dir.exists():
-        log_dir.mkdir(parents=True, exist_ok=True)
-    # Create subdirectories and corresponding log files
+    log_dir.mkdir(parents=True, exist_ok=True)  # Combined for efficiency
     for subdir in subdirs:
-        subdir_path = log_dir / subdir
-        if not subdir_path.exists():
-            subdir_path.mkdir(parents=True, exist_ok=True)  # Create the subdirectory if it doesn't exist
+        (log_dir / subdir).mkdir(parents=True, exist_ok=True)
 
-def log_separator(log_file, exception_occurred=False):
-    """
-    Adds a separator line to the log file if it already contains entries.
-    The separator is only added to exception logs if an exception occurred during the current run.
-    """
+def log_separator(log_file):
+    """Adds a separator to the log file if it's not empty."""
     if os.path.exists(log_file) and os.path.getsize(log_file) > 0:
         separator = "==================================================================================================================================="
         with open(log_file, 'a') as f:
-            f.write(f"\n{separator}\n") 
+            f.write(f"\n{separator}\n")
 
 def setup_logging():
-    global exception_occurred 
     ensure_log_folders()
     settings_folder = pathlib.Path('settings')
     if not settings_folder.exists():
-        print(f"Error: The 'settings' directory does not exist. Please create it.")
-        return
-
+        print("Error: The 'settings' directory does not exist.")
+        return False  # Indicate failure
     config_file = settings_folder / 'log_config.json'
     if not config_file.exists():
         print(f"Error: Logging configuration file '{config_file}' does not exist.")
-        return
-
+        return False  # Indicate failure
     try:
         with open(config_file, "r") as f:
             config = json.load(f)
         logging.config.dictConfig(config)
-    except Exception as e:
+    except (json.JSONDecodeError, FileNotFoundError) as e: # More specific exception handling
         print(f"Error loading logging configuration: {e}")
-    
-     # Check and append separators to existing log files if necessary
-    try:
-        log_separator('logs/general/general.log', exception_occurred)
-        log_separator('logs/selenium/selenium_general.log', exception_occurred)
-        if exception_occurred:
-            log_separator('logs/exceptions/app_exceptions.log', exception_occurred)
-    except Exception as e:
-        exception_occurred = True
-        log_separator('logs/exceptions/app_exceptions.log', exception_occurred)
+        return False  # Indicate failure
 
+    log_separator('logs/general/general.log')
+    log_separator('logs/selenium/selenium_general.log')
+    return True #Indicate success
 
-# Initialize the global variable for tracking exceptions
-exception_occurred = False
+def log_exception(exception):
+    """Logs the exception and adds a separator *after* logging."""
+    exception_log_path = 'logs/exceptions/app_exceptions.log'  # Define the log file path
+    logger = logging.getLogger('exception_logger')  # Get the logger configured for exceptions
+    logger.error(f"Exception occurred: {exception}", exc_info=True)  # Log the exception with traceback
+    # After logging the exception, add a separator to the log file
+    log_separator(exception_log_path)
 
-# Setup logging
-setup_logging()
+setup_logging()  # Check if setup was successful
 general_logger = logging.getLogger('root')
 exception_logger = logging.getLogger('exception_logger')
 

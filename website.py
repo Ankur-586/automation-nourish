@@ -1,5 +1,5 @@
 from settings.config import WebDriverSetup
-from settings.log_setup import general_logger, exception_logger
+from settings.log_setup import general_logger, exception_logger, log_exception
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -8,9 +8,12 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 
 def AddProductFromSearchbar(product_name: str):
-    if isinstance(product_name, str) is False:
-        exception_logger.error("Product name should be a string.")
-        return
+    
+    try:
+        if isinstance(product_name, str) is True:
+            general_logger.info("Product name is a string.")
+    except Exception as e:
+        log_exception(f"Product name should be a string. {e}")
 
     try:
         web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
@@ -26,7 +29,6 @@ def AddProductFromSearchbar(product_name: str):
         general_logger.info("Navigated to nourishstore.in.")
     except Exception as e:
         exception_logger.error(f"Error loading website: {e}")
-        driver.quit()
         return
 
     # Click on the search bar
@@ -37,8 +39,7 @@ def AddProductFromSearchbar(product_name: str):
         search_bar_click.click()
         general_logger.info("Search bar clicked.")
     except Exception as e:
-        exception_logger.error(f"Search Bar Exception: {e}")
-        driver.quit()
+        log_exception(f"Search Bar Exception: {e}")
         return
 
     time.sleep(5)  # It's good to avoid hard waits, but leaving it here temporarily for testing purposes.
@@ -52,7 +53,6 @@ def AddProductFromSearchbar(product_name: str):
         general_logger.info(f"Search term {product_name} entered in the search bar.")
     except Exception as e:
         exception_logger.error(f"Error entering text in the search bar: {e}")
-        driver.quit()
         return
 
     # Fetch product name from search results
@@ -61,7 +61,6 @@ def AddProductFromSearchbar(product_name: str):
             EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
         )
         general_logger.info(f"Fetched product: {fetch_product_text.text}")
-        wetwte
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
         return

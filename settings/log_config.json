@@ -50,7 +50,8 @@
             "level": "DEBUG",
             "handlers": [
                 "general_file_handler"
-            ]
+            ],
+            "propagate": false
         },
         "exception_logger": {
             "level": "ERROR",
