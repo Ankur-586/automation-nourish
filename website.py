@@ -61,9 +61,9 @@ def AddProductFromSearchbar(product_name: str):
             EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
         )
         general_logger.info(f"Fetched product: {fetch_product_text.text}")
+        wetwte
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
-        driver.quit()
         return
     
     # Click on the product to open the product page

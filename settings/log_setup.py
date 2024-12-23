@@ -1,9 +1,13 @@
-import logging, pathlib, json, time
+import logging, pathlib, json, os
 import logging.config
- 
+
+# from settings.log_seperator import log_separator
+
 def ensure_log_folders():
     '''
-    This function ensure the existence of the log folders and their respective log files
+    This function ensure the existence of the log folders and their respective log files/
+    parents=True: Ensures that any missing parent directories are also created (if needed).
+    exist_ok=True: If the directory already exists, it will not raise an error (i.e., it will silently succeed).
     '''
     log_dir = pathlib.Path('logs')
     subdirs = ['general', 'exceptions', 'selenium']
@@ -16,54 +20,74 @@ def ensure_log_folders():
         if not subdir_path.exists():
             subdir_path.mkdir(parents=True, exist_ok=True)  # Create the subdirectory if it doesn't exist
 
-def log_separator(log_file):
-    separator_logger = logging.getLogger('separator_logger')
-    # Create a file handler for the specified log file
-    separator_handler = logging.FileHandler(log_file)
-    separator_handler.setFormatter(logging.Formatter('%(message)s'))
-    # Add the handler to the logger
-    separator_logger.addHandler(separator_handler)
-    separator_logger.propagate = False
-    separator_logger.setLevel(logging.DEBUG)
-    # Define the separator string
-    separator = "=============================================================================================================="
-    # Log the separator to the specified log file
-    separator_logger.debug(separator)
-    # Remove the handler after logging to ensure we don't duplicate it
-    separator_logger.removeHandler(separator_handler)
-    separator_handler.close()
-
+def log_separator(log_file, exception_occurred=False):
+    """
+    Adds a separator line to the log file if it already contains entries.
+    The separator is only added to exception logs if an exception occurred during the current run.
+    """
+    if os.path.exists(log_file) and os.path.getsize(log_file) > 0:
+        separator = "==================================================================================================================================="
+        with open(log_file, 'a') as f:
+            f.write(f"\n{separator}\n") 
 
 def setup_logging():
-    # Ensure log folders and files exist
+    global exception_occurred 
     ensure_log_folders()
-    # Ensure the 'settings' folder exists
     settings_folder = pathlib.Path('settings')
     if not settings_folder.exists():
         print(f"Error: The 'settings' directory does not exist. Please create it.")
-        return 
-    # Path to your logging config file (ensure this is correct)
+        return
+
     config_file = settings_folder / 'log_config.json'
-    # Check if the config file exists
     if not config_file.exists():
         print(f"Error: Logging configuration file '{config_file}' does not exist.")
         return
-    # Load the logging configuration from the JSON file
+
     try:
         with open(config_file, "r") as f:
             config = json.load(f)
-        logging.config.dictConfig(config)  # Apply logging configuration
+        logging.config.dictConfig(config)
     except Exception as e:
         print(f"Error loading logging configuration: {e}")
+    
+     # Check and append separators to existing log files if necessary
+    try:
+        log_separator('logs/general/general.log', exception_occurred)
+        log_separator('logs/selenium/selenium_general.log', exception_occurred)
+        if exception_occurred:
+            log_separator('logs/exceptions/app_exceptions.log', exception_occurred)
+    except Exception as e:
+        exception_occurred = True
+        log_separator('logs/exceptions/app_exceptions.log', exception_occurred)
 
+
+# Initialize the global variable for tracking exceptions
+exception_occurred = False
+
+# Setup logging
+setup_logging()
 general_logger = logging.getLogger('root')
 exception_logger = logging.getLogger('exception_logger')
-setup_logging()
-log_separator('logs/general/general.log')
-log_separator('logs/selenium/selenium_general.log')
-log_separator('logs/exceptions/app_exceptions.log')
+
 
 '''
+# def log_separator(log_file):
+#     separator_logger = logging.getLogger('separator_logger')
+#     # Create a file handler for the specified log file
+#     separator_handler = logging.FileHandler(log_file)
+#     separator_handler.setFormatter(logging.Formatter('%(message)s'))
+#     # Add the handler to the logger
+#     separator_logger.addHandler(separator_handler)
+#     separator_logger.propagate = False
+#     separator_logger.setLevel(logging.DEBUG)
+#     # Define the separator string
+#     separator = "==================================================================================================================================="
+#     # Log the separator to the specified log file
+#     separator_logger.debug(separator)
+#     # Remove the handler after logging to ensure we don't duplicate it
+#     separator_logger.removeHandler(separator_handler)
+#     separator_handler.close()
+---------------------------------------------
 In the code the core logic is that add the seperator if file is non-empty.
 but we can also so like, suppose whenever a log file is triggered,
 then the the seperator should be added else not. but the issue is that how do we know when a log 
@@ -126,10 +150,107 @@ the seperator should be added to the exception log file. So in this case the sep
 In the current implementation, a separator is added to all the log files during the first run. My project has three log files: 
 one for general logging, one for Selenium logs, and a third for exception logging, which is used only when an exception occurs.
 If a script runs without any errors, only the general log file and the Selenium log file are used, so the separator will be added to 
-these two files. However, if the script is run again, the separator will be added to these same two files again. The separator should
+these two files and not the exception but even in that the separeator is getting added. However, if the script is run again, the separator will be added to these same two files again. The separator should
 only be added to the exception log file if an exception occurs. In this case, the separator would not be added to the general or 
 Selenium log files again.
+
+def log_separator(log_file):
+    separator_logger = logging.getLogger('separator_logger')
+    # Create a file handler for the specified log file
+    separator_handler = logging.FileHandler(log_file)
+    separator_handler.setFormatter(logging.Formatter('%(message)s'))
+    # Add the handler to the logger
+    separator_logger.addHandler(separator_handler)
+    separator_logger.propagate = False
+    separator_logger.setLevel(logging.DEBUG)
+    # Define the separator string
+    separator = "==================================================================================================================================="
+    # Log the separator to the specified log file
+    separator_logger.debug(separator)
+    # Remove the handler after logging to ensure we don't duplicate it
+    separator_logger.removeHandler(separator_handler)
+    separator_handler.close()
+    
+now the thing is that the seperator is getting added to all the log files by default. but what i want is that when a log file is
+called then only a seprator should be added.
+i have created 3 log seperators. 
+log_separator('logs/general/general.log')
+log_separator('logs/selenium/selenium_general.log')
+log_separator('logs/exceptions/app_exceptions.log') 
+
+what condition can i put that only adds the seperator when a log file is called
+
+case 1: when script runs for the first time and the all file are empty and no exception occurs, then no seperator should be added to the any log files.
+case 2: when script runs again, then a seperator should be added to the general and selenium because there are already logs statement present and if no seperator is there
+        then the logs will mix together and will not look good.
+case 3: when scripts run and suppose exception occurs, then the exception_log should get populated. the seperator should get added to the prevoius logs becasue
+        even if there are errors but still some log might get written in them. And on the exception logs no seperator is added as it is its first riun.
+case 4: when script runs and suppose exception occurs, the the exception_log should get populated and a seperator should get added as there is a log statemtn present
+        and to make a line between the logs.
+case 5: when th script runs again and no exception occurs, then the seperator should be added to the general and selenium logs as there are already log statements present.
+        snd no seperator should be added to the exception log as it it is not being triggered.
 '''
 
+'''
+def log_separator(log_file):
+    separator_logger = logging.getLogger('separator_logger')
+    # Create a file handler for the specified log file
+    separator_handler = logging.FileHandler(log_file)
+    separator_handler.setFormatter(logging.Formatter('%(message)s'))
+    # Add the handler to the logger
+    separator_logger.addHandler(separator_handler)
+    separator_logger.propagate = False
+    separator_logger.setLevel(logging.DEBUG)
+    # Define the separator string
+    separator = "==================================================================================================================================="
+    # Log the separator to the specified log file
+    separator_logger.debug(separator)
+    # Remove the handler after logging to ensure we don't duplicate it
+    separator_logger.removeHandler(separator_handler)
+    separator_handler.close()
+    
+now the thing is that the seperator is getting added to all the log files by default. but what i want is that when a log file is
+called then only a seprator should be added.
 
-  
+case 1: when script runs for the first time and the all file are empty and no exception occurs, then no seperator should be added to the any log files.
+case 2: when script runs again, then a seperator should be added to the general and selenium because there are already logs statement present.
+case 3: when scripts run and suppose exception occurs, then the exception_log should get populated. the seperator should get added to the prevoius logs (general and selenium) becasue
+        even if there are errors but still some log might get written in them. And on the exception logs no seperator is added as it is its first run.
+case 4: when script runs again and suppose another exception occurs, the the exception_log should get populated and a seperator should get added as there is a log statement present
+case 5: when th script runs again and no exception occurs, then the seperator should be added to the general and selenium logs as there are already log statements present.
+        snd no seperator should be added to the exception log as it it is not being triggered.
+        '''
+'''
+You want to add a separator to the log files (general.log, selenium.log, exception.log) under different conditions:
+
+First run: No separators should be added.
+Second run (with an exception): A separator should be added to general.log and selenium.log because there is already content, and exception.log should receive a separator as well because an exception occurred.
+Subsequent runs (with exceptions): If an exception occurs again, a separator should be added to exception.log (if content exists), and the separator should be added to general.log and selenium.log if content exists.
+No exception: If no exception occurs, a separator should be added to general.log and selenium.log if they have content, but not to exception.log.
+'''
+
+'''
+Latest (17:30)
+-------------------------------
+You are working with a logging system where you want to add separators to various log files (general, selenium, and exceptions) under specific conditions. The goal is to ensure that separators are added only when appropriate based on whether content already exists in the log files or if an exception occurred during the run.
+
+Expected Behavior:
+First Run (No exception):
+
+No separator should be added to any log files, because there is no previous content, and no exception has occurred.
+Subsequent Runs (With exception):
+
+A separator should be added to the general and selenium log files only if they contain existing content (i.e., they are not empty).
+The app_exceptions.log file should only get a separator if an exception occurred during the current run.
+Handling of Exception Logs:
+
+If an exception occurs during the run, the app_exceptions.log should not receive a separator unless it is triggered by an exception during the current run.
+Log File Conditions:
+
+A separator should only be added to a file if the file already contains content (i.e., it’s not empty).
+The Problem:
+The separators are not being added correctly under all conditions.
+First run works fine.
+Subsequent runs with exceptions: The separator is not being added to app_exceptions.log despite an exception having occurred.
+General & Selenium logs should receive a separator only if content exists in them.
+'''
