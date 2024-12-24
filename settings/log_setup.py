@@ -50,7 +50,6 @@ def log_exception(exception):
 
 setup_logging()
 general_logger = logging.getLogger('root')
-print('oueqwryqwuryuryqiuyriuqyriuqwyruqwqiur',general_logger)
 
 # exception_logger = logging.getLogger('exception_logger')
 # exception_logger.error('This is an error message for the exception logger')
@@ -201,12 +200,12 @@ def log_separator(log_file):
 now the thing is that the seperator is getting added to all the log files by default. but what i want is that when a log file is
 called then only a seprator should be added.
 
-case 1: when script runs for the first time and the all file are empty and no exception occurs, then no seperator should be added to the any log files.
-case 2: when script runs again, then a seperator should be added to the general and selenium because there are already logs statement present.
-case 3: when scripts run and suppose exception occurs, then the exception_log should get populated. the seperator should get added to the prevoius logs (general and selenium) becasue
+when script runs for the first time and the all file are empty and no exception occurs, then no seperator should be added to the any log files.
+when script runs again, then a seperator should be added to the general and selenium because there are already logs statement present.
+when scripts run and suppose exception occurs, then the exception_log should get populated. the seperator should get added to the prevoius logs (general and selenium) becasue
         even if there are errors but still some log might get written in them. And on the exception logs no seperator is added as it is its first run.
-case 4: when script runs again and suppose another exception occurs, the the exception_log should get populated and a seperator should get added as there is a log statement present
-case 5: when th script runs again and no exception occurs, then the seperator should be added to the general and selenium logs as there are already log statements present.
+when script runs again and suppose another exception occurs, the the exception_log should get populated and a seperator should get added as there is a log statement present
+when th script runs again and no exception occurs, then the seperator should be added to the general and selenium logs as there are already log statements present.
         snd no seperator should be added to the exception log as it it is not being triggered.
         '''
 '''
