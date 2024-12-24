@@ -45,16 +45,21 @@ def log_exception(exception):
     """Logs the exception and adds a separator *after* logging."""
     exception_log_path = 'logs/exceptions/app_exceptions.log'  # Define the log file path
     logger = logging.getLogger('exception_logger')  # Get the logger configured for exceptions
-    logger.error(f"Exception occurred: {exception}", exc_info=True)  # Log the exception with traceback
-    # After logging the exception, add a separator to the log file
+    logger.error(exception, exc_info=True)  # Log and check return value
     log_separator(exception_log_path)
 
-setup_logging()  # Check if setup was successful
+setup_logging()
 general_logger = logging.getLogger('root')
-exception_logger = logging.getLogger('exception_logger')
+print('oueqwryqwuryuryqiuyriuqyriuqwyruqwqiur',general_logger)
+
+# exception_logger = logging.getLogger('exception_logger')
+# exception_logger.error('This is an error message for the exception logger')
 
 
 '''
+in this code what is happening is that, error is gettitng logged to the exception logger wiht a seperator butn the general and
+selenium even though nothing is getting logged to it but still a seperator is geetting added to these log filesa
+
 # def log_separator(log_file):
 #     separator_logger = logging.getLogger('separator_logger')
 #     # Create a file handler for the specified log file

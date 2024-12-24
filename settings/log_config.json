@@ -51,7 +51,7 @@
             "handlers": [
                 "general_file_handler"
             ],
-            "propagate": false
+            "propagate": true
         },
         "exception_logger": {
             "level": "ERROR",

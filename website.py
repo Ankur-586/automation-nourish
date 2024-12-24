@@ -1,5 +1,5 @@
 from settings.config import WebDriverSetup
-from settings.log_setup import general_logger, exception_logger, log_exception
+from settings.log_setup import general_logger, log_exception
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -9,18 +9,16 @@ import time
 
 def AddProductFromSearchbar(product_name: str):
     
-    try:
-        if isinstance(product_name, str) is True:
-            general_logger.info("Product name is a string.")
-    except Exception as e:
-        log_exception(f"Product name should be a string. {e}")
+    if not isinstance(product_name, str):
+        log_exception("Product name should be a string")
+        return
 
     try:
         web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
         driver = web_driver_setup.setup_driver()
         general_logger.info("WebDriver initialized successfully.")
     except Exception as e:
-        exception_logger.error(f"Error initializing WebDriver: {e}")
+        log_exception(f"Error initializing WebDriver: {e}")
         return
 
     # Open the website
@@ -28,7 +26,7 @@ def AddProductFromSearchbar(product_name: str):
         driver.get("https://nourishstore.in/")
         general_logger.info("Navigated to nourishstore.in.")
     except Exception as e:
-        exception_logger.error(f"Error loading website: {e}")
+        log_exception(f"Error loading website: {e}")
         return
 
     # Click on the search bar
@@ -52,7 +50,7 @@ def AddProductFromSearchbar(product_name: str):
         text_input.send_keys(product_name)
         general_logger.info(f"Search term {product_name} entered in the search bar.")
     except Exception as e:
-        exception_logger.error(f"Error entering text in the search bar: {e}")
+        log_exception(f"Error entering text in the search bar: {e}")
         return
 
     # Fetch product name from search results
@@ -62,7 +60,7 @@ def AddProductFromSearchbar(product_name: str):
         )
         general_logger.info(f"Fetched product: {fetch_product_text.text}")
     except Exception as e:
-        exception_logger.error(f"Error fetching product text: {e}")
+        log_exception(f"Error fetching product text: {e}")
         return
     
     # Click on the product to open the product page
@@ -74,16 +72,16 @@ def AddProductFromSearchbar(product_name: str):
         if expected_product_page_url == actual_product_page_url:
             general_logger.info("Product page opened successfully")
             return 'Pass'
-        exception_logger.error("Product page did not open successfully")
+        log_exception("Product page did not open successfully")
         return 'Fail'
     except Exception as e:
-        exception_logger.error(f"Error opening product page: {e}")
+        log_exception(f"Error opening product page: {e}")
     
     try:
         product_name = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1')
         general_logger.info(f"Product name: {product_name}")
     except Exception as e:
-        exception_logger.error(f"Error fetching product name: {e}")
+        log_exception(f"Error fetching product name: {e}")
     
     # Log that everything was successful
     general_logger.info("Product search from search bar completed successfully.")
@@ -91,5 +89,5 @@ def AddProductFromSearchbar(product_name: str):
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    AddProductFromSearchbar('arhar')
+    AddProductFromSearchbar(56)
     
