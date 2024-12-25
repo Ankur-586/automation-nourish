@@ -50,6 +50,7 @@ def log_exception(exception):
 
 setup_logging()
 general_logger = logging.getLogger('root')
+exception_logger = logging.getLogger('exception_logger')
 
 # exception_logger = logging.getLogger('exception_logger')
 # exception_logger.error('This is an error message for the exception logger')
@@ -218,27 +219,145 @@ No exception: If no exception occurs, a separator should be added to general.log
 '''
 
 '''
-Latest (17:30)
+Latest (12:30) 25-12-25 
 -------------------------------
-You are working with a logging system where you want to add separators to various log files (general, selenium, and exceptions) under specific conditions. The goal is to ensure that separators are added only when appropriate based on whether content already exists in the log files or if an exception occurred during the run.
+First Run (No Exceptions):
+No logs have been written yet, so no separators are added to general.log, selenium.log, or app_exceptions.log.
+The exception log (app_exceptions.log) remains empty as no exceptions occurred.
+First Run (With Exception):
 
-Expected Behavior:
-First Run (No exception):
+If an exception occurs early in the function (e.g., invalid input such as a non-string product_name), the exception log (app_exceptions.log) will be populated with the exception details.
+No separator will be added to app_exceptions.log on this first exception since no prior logs exist.
+No separators are added to general.log or selenium.log, as no logging occurred before the exception.
+Subsequent Runs (No Exceptions):
 
-No separator should be added to any log files, because there is no previous content, and no exception has occurred.
-Subsequent Runs (With exception):
+Separators will be added to general.log and selenium.log (because they already contain logs from previous runs).
+No separator will be added to app_exceptions.log, as no new exception occurred.
+Subsequent Runs (With Exceptions):
 
-A separator should be added to the general and selenium log files only if they contain existing content (i.e., they are not empty).
-The app_exceptions.log file should only get a separator if an exception occurred during the current run.
-Handling of Exception Logs:
+If an exception occurs, the exception log (app_exceptions.log) will be populated with the exception details.
+Separator will be added to app_exceptions.log only if it already contains logs (i.e., it’s not the first exception).
+Separators will be added to general.log and selenium.log, as they have logs from previous runs.
+Separator Behavior:
 
-If an exception occurs during the run, the app_exceptions.log should not receive a separator unless it is triggered by an exception during the current run.
-Log File Conditions:
-
-A separator should only be added to a file if the file already contains content (i.e., it’s not empty).
-The Problem:
-The separators are not being added correctly under all conditions.
-First run works fine.
-Subsequent runs with exceptions: The separator is not being added to app_exceptions.log despite an exception having occurred.
-General & Selenium logs should receive a separator only if content exists in them.
+No separator should be added to any log file (including app_exceptions.log) if no logs were written earlier in the log file (i.e., it’s the first log entry or the first exception).
+Separators should only be added to log files that already contain logs (i.e., once a log entry has been made in the file, separators can be added in subsequent runs).
+Key Rules:
+First Run (no logs, no exception): No separators.
+First Exception (error occurs before any other log entries): No separators added to general.log, selenium.log, or exception.log.
+Subsequent Runs (with logs and exception):
+Separator added to general.log and selenium.log if logs exist.
+Separator added to exception.log only if logs already exist (not on first exception).
+This should now match your expectations for separator behavior based on the presence or absence of logs in the files.
+'''
+'''
+i want a logger system in my code that creates 3 log files under diffrent log folder and i want to add
+suppose general logs to general.log and all the errors to the exception.log and selenium related to selenium folder
+i will share you my log_config.json file
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "json": {
+            "class": "logging.Formatter",
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        }
+    },
+    "handlers": {
+        "general_file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "DEBUG",
+            "formatter": "json",
+            "filename": "logs/general/general.log",
+            "maxBytes": 10485760,
+            "backupCount": 3,
+            "encoding": "utf8"
+        },
+        "exception_file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "ERROR",
+            "formatter": "json",
+            "filename": "logs/exceptions/app_exceptions.log",
+            "maxBytes": 10485760,
+            "backupCount": 3,
+            "encoding": "utf8"
+        },
+        "selenium_general_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "DEBUG",
+            "formatter": "json",
+            "filename": "logs/selenium/selenium_general.log",
+            "maxBytes": 10485760,
+            "backupCount": 3,
+            "encoding": "utf8"
+        },
+        "selenium_error_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "ERROR",
+            "formatter": "json",
+            "filename": "logs/selenium/selenium_errors.log",
+            "maxBytes": 10485760,
+            "backupCount": 3,
+            "encoding": "utf8"
+        }
+    },
+    "loggers": {
+        "root": {
+            "level": "DEBUG",
+            "handlers": [
+                "general_file_handler"
+            ],
+            "propagate": true
+        },
+        "exception_logger": {
+            "level": "ERROR",
+            "handlers": [
+                "exception_file_handler"
+            ],
+            "propagate": false
+        },
+        "selenium_logger": {
+            "level": "DEBUG", 
+            "handlers": [
+                "selenium_general_handler"
+            ],
+            "propagate": false
+        },
+        "selenium.webdriver.common.service": {
+            "level": "DEBUG",  
+            "handlers": [
+                "selenium_general_handler"
+            ],
+            "propagate": false
+        },
+        "selenium.webdriver.common.selenium_manager": {
+            "level": "DEBUG",  
+            "handlers": [
+                "selenium_general_handler"
+            ],
+            "propagate": false
+        },
+        "selenium.webdriver.remote.remote_connection": {
+            "level": "DEBUG",
+            "handlers": [
+                "selenium_general_handler"
+            ],
+            "propagate": false
+        },
+        "urllib3.connectionpool": {
+            "level": "DEBUG",  
+            "handlers": [
+                "selenium_general_handler"
+            ],
+            "propagate": false
+        },
+        "selenium_error_logger": {
+            "level": "ERROR",  
+            "handlers": [
+                "selenium_error_handler"
+            ],
+            "propagate": false
+        }
+    }
+}
 '''

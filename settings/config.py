@@ -3,7 +3,7 @@ import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from settings.log_setup import log_exception, general_logger
+from settings.test import general_logger, exception_logger
 # from settings.log_seperator import exception_logger, general_logger
 
 from fake_useragent import UserAgent
@@ -22,7 +22,7 @@ class WebDriverSetup:
             ua = UserAgent()
             return ua.random
         except Exception as e:
-            log_exception(f"Error generating User-Agent: {e}")
+            exception_logger.error(f"Error generating User-Agent: {e}")
     
     def setup_driver(self):
         chrome_options = Options()
@@ -54,7 +54,7 @@ class WebDriverSetup:
             self.driver = webdriver.Chrome(options=chrome_options)
             general_logger.info(f"WebDriver setup complete with User-Agent: {self.user_agent}")
         except Exception as e:
-            log_exception(f"Failed to set up WebDriver: {e}")
+            exception_logger.error(f"{e}")
             raise
         
         return self.driver
@@ -64,7 +64,7 @@ class WebDriverSetup:
             self.driver.quit()
             general_logger.info("WebDriver closed successfully.")
         else:
-            log_exception("WebDriver was not initialized.")
+            exception_logger.error("WebDriver was not initialized.")
 
 # def setup():
     
