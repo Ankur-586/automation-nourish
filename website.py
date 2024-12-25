@@ -92,5 +92,5 @@ def AddProductFromSearchbar(product_name: str):
     # web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    AddProductFromSearchbar(56)
+    AddProductFromSearchbar('56')
     
