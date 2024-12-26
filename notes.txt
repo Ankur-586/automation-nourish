@@ -44,3 +44,19 @@ happend according to it and automatically.
 
 
 The Complete 2024 Software Testing Bootcamp
+
+how do i do automation testing using python according to industry standards
+
+my_project/      
+├── settings/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── test.py
+│   └── log_config.json
+└── pages
+│   └── website.py    
+└── tests/
+    └── test_website.py   
+
+
+run: python -m tests.test_website

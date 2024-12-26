@@ -5,55 +5,49 @@ def ensure_log_folders():
     """Ensures the existence of log folders."""
     log_dir = pathlib.Path('logs')
     subdirs = ['general', 'exceptions', 'selenium']
-    log_dir.mkdir(parents=True, exist_ok=True)  # Create log directory if it doesn't exist
+    log_dir.mkdir(parents=True, exist_ok=True)  # Combined for efficiency
     for subdir in subdirs:
         (log_dir / subdir).mkdir(parents=True, exist_ok=True)
 
 def log_separator(log_file):
     """Adds a separator to the log file if it's not empty."""
-    log_file_path = pathlib.Path(log_file)
-    if log_file_path.exists() and log_file_path.stat().st_size > 0:
+    if os.path.exists(log_file) and os.path.getsize(log_file) > 0:
         separator = "=" * 180
-        with log_file_path.open('a') as f:
+        with open(log_file, 'a') as f:
             f.write(f"\n{separator}\n")
 
 def setup_logging():
-    """Sets up logging configuration based on the log_config.json file."""
     ensure_log_folders()
-
     settings_folder = pathlib.Path('settings')
+    if not settings_folder.exists():
+        print("Error: The 'settings' directory does not exist.")
+        return False  # Indicate failure
     config_file = settings_folder / 'log_config.json'
-
-    if not settings_folder.exists() or not config_file.exists():
-        print(f"Error: The settings folder or the log_config.json file does not exist.")
-        return None, None  # Indicate failure by returning None for loggers
-
+    if not config_file.exists():
+        print(f"Error: Logging configuration file '{config_file}' does not exist.")
+        return False  # Indicate failure
     try:
-        with config_file.open('r') as f:
+        with open(config_file, "r") as f:
             config = json.load(f)
         logging.config.dictConfig(config)
-    except (json.JSONDecodeError, FileNotFoundError) as e:
+    except (json.JSONDecodeError, FileNotFoundError) as e: # More specific exception handling
         print(f"Error loading logging configuration: {e}")
-        return None, None  # Return None if the config loading fails
-    
-    general_logger = logging.getLogger('root')
-    exception_logger = logging.getLogger('exception_logger')
+        return False  # Indicate failure
+    return True #Indicate success
 
-    # Immediately log separators for each log file
-    log_separator('logs/general/general.log')
-    log_separator('logs/selenium/selenium_general.log')
-    # log_separator('logs/exceptions/app_exceptions.log')
-
-    return general_logger, exception_logger  # Return the loggers after successful setup
-
-def log_exception(exception, exception_logger):
+def log_exception(exception):
     """Logs the exception and adds a separator *after* logging."""
-    exception_log_path = 'logs/exceptions/app_exceptions.log'
-    exception_logger.error(exception, exc_info=True)
+    exception_log_path = 'logs/exceptions/app_exceptions.log'  # Define the log file path
+    logger = logging.getLogger('exception_logger')  # Get the logger configured for exceptions
+    logger.error(exception, exc_info=True)  # Log and check return value
     log_separator(exception_log_path)
 
-# Setup logging
-general_logger, exception_logger = setup_logging()
+setup_logging()
+general_logger = logging.getLogger('root')
+log_separator('logs/general/general.log')
+
+exception_logger = logging.getLogger('exception_logger')
+log_separator('logs/selenium/selenium_general.log')
 
 # exception_logger = logging.getLogger('exception_logger')
 # exception_logger.error('This is an error message for the exception logger')
