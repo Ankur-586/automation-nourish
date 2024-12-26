@@ -13,6 +13,7 @@ class SearchProduct:
         self.input_box_xpath = '//*[@id="autocompleteInput"]'
         self.search_result_xpath = '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'
         self.product_page_xpath = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1'
+        self.product_500_gm_actual_price = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]'
 
     def open_search_bar(self):
         try:
@@ -46,7 +47,7 @@ class SearchProduct:
             )
             product_name = product.text
             product.click()
-            general_logger.info(f"Fetched Product Name: {product_name}")
+            general_logger.info(f"Fetched Product Name from search bar: {product_name}")
             return product_name
         except Exception as e:
             exception_logger.error(f"Error fetching or clicking on product: {e}")
@@ -65,8 +66,16 @@ class SearchProduct:
     def get_product_name(self):
         try:
             product_name = self.driver.find_element(By.XPATH, self.product_page_xpath).text
-            general_logger.info("Search query en")
             return product_name
         except Exception as e:
             exception_logger.error(f"Error fetching product name from product page: {e}")
             return None
+        
+    def get_500_gm_actual_price(self):
+        try:
+            actul_product_price = self.driver.find_element(By.XPATH, self.product_500_gm_actual_price).text
+            return actul_product_price
+        except Exception as e:
+            exception_logger.error(f"Error fetching product price from product page: {e}")
+            return None
+    # How to handle dropdown in Selenium Python?

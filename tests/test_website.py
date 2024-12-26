@@ -6,7 +6,7 @@
 from settings.config import WebDriverSetup
 from settings.log_setup import general_logger, exception_logger
 
-from pages.test_WebFlow import SearchProduct
+from pages.searchProd import SearchProduct
 
 def AddProductFromSearchbar(product_name: str):
     if not isinstance(product_name, str):
@@ -59,6 +59,14 @@ def AddProductFromSearchbar(product_name: str):
     else:
         exception_logger.error("Error fetching product name from product page.")
 
+    # get actual price of 500 gm product
+    actual_500_gm_product_price = search_page.get_500_gm_actual_price()
+    if actual_500_gm_product_price:
+        general_logger.info(f"Actual 500 gm product price: ₹{actual_500_gm_product_price}")
+    else:
+        return
+        
+    # Close the WebDriver
     web_driver_setup.close_driver()
 
 AddProductFromSearchbar('arhar')
