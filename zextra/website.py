@@ -92,21 +92,20 @@ def AddProductFromSearchbar(product_name: str):
     prices = []
     # options = [opt.text for opt in select.options]
     options = [opt.get_attribute('label') for opt in select.options]
-    print(options)
     for idx in range(0, len(select.options)):
-        print(idx)
+        opt = select.options[idx]
         select.select_by_index(idx)
         actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
         discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
         prices.append({
-                f"actualPrice": actualPrice,
-                f"discountedPrice": discountedPrice
+                f"{opt.get_attribute('label')} actualPrice": actualPrice,
+                f"{opt.get_attribute('label')} discountedPrice": discountedPrice
             })
-        print(f'Option {idx} - Actual Price: {actualPrice}, Discounted Price: {discountedPrice}')
+        # print(f'Option {idx} - Actual Price: {actualPrice}, Discounted Price: {discountedPrice}')
         add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
         add_to_cart.click()
     print(prices)
-    print(f'Actual Price:-> 500gm: {actualPrice}, 1kg: {actualPrice}\nDiscounted Price:-> 500gm: {discountedPrice}, 1kg: {discountedPrice}')
+    print(f'Actual Price:->{} {actualPrice}, 1kg: {actualPrice}\nDiscounted Price:-> 500gm: {discountedPrice}, 1kg: {discountedPrice}')
     
     # time.sleep(8)
     
