@@ -60,3 +60,9 @@ my_project/
 
 
 run: python -m tests.test_website
+
+
+prices = [['163.00', '125.63'], ['315.00', '257.25']]
+actualPrice, discountedPrice = [item for sublist in prices for item in sublist]
+print(f'Actual Price:-> 500gm: {actualPrice[0]}, 1kg: {actualPrice[1]}\nDiscounted Price:-> 500gm: {discountedPrice[0]}, 1kg: {discountedPrice[1]}')
+

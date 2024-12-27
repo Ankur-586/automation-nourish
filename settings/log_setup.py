@@ -42,7 +42,7 @@ def setup_logging():
     # Immediately log separators for each log file
     log_separator('logs/general/general.log')
     log_separator('logs/selenium/selenium_general.log')
-    # log_separator('logs/exceptions/app_exceptions.log')
+    log_separator('logs/exceptions/app_exceptions.log')
 
     return general_logger, exception_logger  # Return the loggers after successful setup
 

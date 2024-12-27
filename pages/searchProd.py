@@ -5,6 +5,7 @@ from settings.log_setup import general_logger, exception_logger
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 
 class SearchProduct:
     def __init__(self, driver):
@@ -13,7 +14,10 @@ class SearchProduct:
         self.input_box_xpath = '//*[@id="autocompleteInput"]'
         self.search_result_xpath = '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'
         self.product_page_xpath = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1'
-        self.product_500_gm_actual_price = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]'
+        self.select_weight_dropdown = '//*[@id="select1"]'
+        self.actualPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]'
+        self.discountedPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]'
+        self.add_to_cart = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button'
 
     def open_search_bar(self):
         try:
@@ -71,9 +75,12 @@ class SearchProduct:
             exception_logger.error(f"Error fetching product name from product page: {e}")
             return None
         
-    def get_500_gm_actual_price(self):
+    def get_weight_dropDown(self):
         try:
-            actul_product_price = self.driver.find_element(By.XPATH, self.product_500_gm_actual_price).text
+            select = Select(self.driver.find_element(By.XPATH, self.select_weight_dropdown))
+            for idx in range(select.options):
+                select.select_by_index(idx)
+                actul_product_price = self.driver.find_element(By.XPATH, self.select_weight_dropdown).text
             return actul_product_price
         except Exception as e:
             exception_logger.error(f"Error fetching product price from product page: {e}")
