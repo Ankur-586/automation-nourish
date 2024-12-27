@@ -105,7 +105,7 @@ def AddProductFromSearchbar(product_name: str):
         add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
         add_to_cart.click()
     print(prices)
-    print(f'Actual Price:->{} {actualPrice}, 1kg: {actualPrice}\nDiscounted Price:-> 500gm: {discountedPrice}, 1kg: {discountedPrice}')
+    # print(f'Actual Price:->{} {actualPrice}, 1kg: {actualPrice}\nDiscounted Price:-> 500gm: {discountedPrice}, 1kg: {discountedPrice}')
     
     # time.sleep(8)
     

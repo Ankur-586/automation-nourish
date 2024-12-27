@@ -75,14 +75,23 @@ class SearchProduct:
             exception_logger.error(f"Error fetching product name from product page: {e}")
             return None
         
-    def get_weight_dropDown(self):
+    def add_to_cart(self):
         try:
             select = Select(self.driver.find_element(By.XPATH, self.select_weight_dropdown))
-            for idx in range(select.options):
+            prices = []
+            for idx in range(0, len(select.options)):
+                opt = select.options[idx]
                 select.select_by_index(idx)
-                actul_product_price = self.driver.find_element(By.XPATH, self.select_weight_dropdown).text
-            return actul_product_price
+                actualPrice = self.driver.find_element(By.XPATH, self.select_weight_dropdown).text
+                discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
+                prices.append({
+                    f"{opt.get_attribute('label')} actualPrice": actualPrice,
+                    f"{opt.get_attribute('label')} discountedPrice": discountedPrice
+                })
+                add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
+                add_to_cart.click()
+            return prices
         except Exception as e:
             exception_logger.error(f"Error fetching product price from product page: {e}")
             return None
-    # How to handle dropdown in Selenium Python?
+    

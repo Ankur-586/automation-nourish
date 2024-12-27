@@ -60,7 +60,7 @@ def AddProductFromSearchbar(product_name: str):
         exception_logger.error("Error fetching product name from product page.")
 
     # get actual price of 500 gm product
-    actual_500_gm_product_price = search_page.get_500_gm_actual_price()
+    product_weight = search_page.get_weight_dropDown()
     if actual_500_gm_product_price:
         general_logger.info(f"Actual 500 gm product price: ₹{actual_500_gm_product_price}")
     else:
