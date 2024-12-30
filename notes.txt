@@ -66,3 +66,7 @@ prices = [['163.00', '125.63'], ['315.00', '257.25']]
 actualPrice, discountedPrice = [item for sublist in prices for item in sublist]
 print(f'Actual Price:-> 500gm: {actualPrice[0]}, 1kg: {actualPrice[1]}\nDiscounted Price:-> 500gm: {discountedPrice[0]}, 1kg: {discountedPrice[1]}')
 
+search terms:
+how to get the name of all dropdown elements in selenium python
+how to get the name options of all dropdown elements in selenium python
+how to get the name options label of all dropdown elements in selenium python 
