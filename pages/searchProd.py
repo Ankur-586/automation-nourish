@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import Select
 class SearchProduct:
     def __init__(self, driver):
         self.driver = driver
-        self.search_bar = '/html/body/header/nav/div[3]'
+        self.search_bar_text = '/html/body/header/nav/div[3]'
         self.input_box = '//*[@id="autocompleteInput"]'
         self.search_result = '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'
         self.product_page = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1'
@@ -22,7 +22,7 @@ class SearchProduct:
     def open_search_bar(self):
         try:
             search_bar = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, self.search_bar))
+                EC.presence_of_element_located((By.XPATH, self.search_bar_text))
             )
             search_bar.click()
             general_logger.info("SearchBar clicked successfully")

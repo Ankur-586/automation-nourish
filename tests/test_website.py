@@ -40,7 +40,7 @@ def test_add_product(add_product_from_searchbar):
     product_name = "Arhar Dal"  # Use a product name for the test
 
     # Perform search and selection
-    assert search_page.open_search_bar(), "Failed to open search bar"
+    assert search_page.open_search_bar(), "Failed to open search barr"
     assert search_page.enter_search_query(product_name), "Failed to enter search query"
     product_name_from_search = search_page.fetch_and_click_product()
 
