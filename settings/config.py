@@ -5,7 +5,6 @@ from settings.log_setup import general_logger, exception_logger
 
 from fake_useragent import UserAgent
 
-
 class WebDriverSetup:
     
     def __init__(self, headless=True, ignore_cert_errors=True, user_agent=None):

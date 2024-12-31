@@ -10,10 +10,10 @@ from selenium.webdriver.support.ui import Select
 class SearchProduct:
     def __init__(self, driver):
         self.driver = driver
-        self.search_bar_xpath = '/html/body/header/nav/div[3]'
-        self.input_box_xpath = '//*[@id="autocompleteInput"]'
-        self.search_result_xpath = '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'
-        self.product_page_xpath = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1'
+        self.search_bar = '/html/body/header/nav/div[3]'
+        self.input_box = '//*[@id="autocompleteInput"]'
+        self.search_result = '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'
+        self.product_page = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1'
         self.select_weight_dropdown = '//*[@id="select1"]'
         self.actualPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]'
         self.discountedPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]'
@@ -22,7 +22,7 @@ class SearchProduct:
     def open_search_bar(self):
         try:
             search_bar = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, self.search_bar_xpath))
+                EC.presence_of_element_located((By.XPATH, self.search_bar))
             )
             search_bar.click()
             general_logger.info("SearchBar clicked successfully")
@@ -34,7 +34,7 @@ class SearchProduct:
     def enter_search_query(self, product_name):
         try:
             text_input = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, self.input_box_xpath))
+                EC.presence_of_element_located((By.XPATH, self.input_box))
             )
             text_input.clear()
             text_input.send_keys(product_name)
@@ -47,7 +47,7 @@ class SearchProduct:
     def fetch_and_click_product(self):
         try:
             product = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_element_located((By.XPATH, self.search_result_xpath))
+                EC.visibility_of_element_located((By.XPATH, self.search_result))
             )
             product_name = product.text
             product.click()
@@ -69,7 +69,7 @@ class SearchProduct:
 
     def get_product_name(self):
         try:
-            product_name = self.driver.find_element(By.XPATH, self.product_page_xpath).text
+            product_name = self.driver.find_element(By.XPATH, self.product_page).text
             return product_name
         except Exception as e:
             exception_logger.error(f"Error fetching product name from product page: {e}")
@@ -94,4 +94,5 @@ class SearchProduct:
         except Exception as e:
             exception_logger.error(f"Error fetching product price from product page: {e}")
             return None
-    
+
+# x = SearchProduct

@@ -35,6 +35,8 @@ Packages:
 ---------
 pip install selenium
 pip install fake-useragent
+pip install pytest
+pip install pytest-html
 -----------------------------------
 
 i am developing a automation script for automating webisite testing. 
@@ -70,3 +72,5 @@ search terms:
 how to get the name of all dropdown elements in selenium python
 how to get the name options of all dropdown elements in selenium python
 how to get the name options label of all dropdown elements in selenium python 
+
+pytest tests/ --maxfail=3 --disable-warnings --html=report.html
