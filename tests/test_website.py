@@ -11,14 +11,17 @@ from pages.searchProd import SearchProduct
 import pytest
 
 @pytest.fixture()
-def add_product_from_searchbar():
+def driver_setup():
     """
     This fixture sets up the WebDriver and performs product search actions.
     """
     web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
     driver = web_driver_setup.setup_driver()
+    yield driver  
 
-    # Open the website
+def test_open_site(driver_setup):
+    
+    driver = driver_setup
     try:
         driver.get("https://nourishstore.in/")
         general_logger.info("Navigated to nourishstore.in")
@@ -27,17 +30,14 @@ def add_product_from_searchbar():
         driver.quit()
         pytest.fail(f"Failed to load website: {e}")
 
-    yield driver  
-    web_driver_setup.close_driver()
-
-def test_add_product(add_product_from_searchbar):
+def test_add_product(driver_setup):
     """
     Test case for adding a product from the search bar to the cart.
     """
-    driver = add_product_from_searchbar
+    driver = driver_setup
     search_page = SearchProduct(driver)
 
-    product_name = "Arhar Dal"  # Use a product name for the test
+    product_name = "arhar"  # Use a product name for the test
 
     # Perform search and selection
     assert search_page.open_search_bar(), "Failed to open search barr"
@@ -98,9 +98,7 @@ def test_add_product(add_product_from_searchbar):
     #     return
         
     # Close the WebDriver
-    # web_driver_setup.close_driver()
+    web_driver_setup.close_driver()
 
 # AddProductFromSearchbar('arhar')
 
-x = add_product_from_searchbar
-test_add_product(x)
