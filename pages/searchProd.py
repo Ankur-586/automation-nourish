@@ -62,6 +62,7 @@ class SearchProduct:
             time.sleep(5)  # Allow the product page to load
             actual_url = self.driver.current_url
             if actual_url == expected_url:
+                general_logger.info(f"Product Page Opened Successfully: {actual_url}||{expected_url}")
                 return True
         except Exception as e:
             exception_logger.error(f"Error validating product page: {e}")
@@ -70,14 +71,16 @@ class SearchProduct:
     def get_product_name(self):
         try:
             product_name = self.driver.find_element(By.XPATH, self.product_page).text
+            general_logger.info(f"Product Name on Product Page : {product_name}")
             return product_name
         except Exception as e:
             exception_logger.error(f"Error fetching product name from product page: {e}")
             return None
         
-    def add_to_cart(self):
+    def add_product_to_cart(self):
         try:
             select = Select(self.driver.find_element(By.XPATH, self.select_weight_dropdown))
+            print('qwertyuiopasdfg','after this')
             prices = []
             for idx in range(0, len(select.options)):
                 opt = select.options[idx]
@@ -90,7 +93,8 @@ class SearchProduct:
                 })
                 add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
                 add_to_cart.click()
-            return prices
+                general_logger.info(f"Product Info : {prices}")
+                return prices
         except Exception as e:
             exception_logger.error(f"Error fetching product price from product page: {e}")
             return None

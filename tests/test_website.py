@@ -27,20 +27,21 @@ def test_open_site(driver_setup):
         general_logger.info("Navigated to nourishstore.in")
     except Exception as e:
         exception_logger.error(f"Error loading website: {e}")
-        driver.quit()
         pytest.fail(f"Failed to load website: {e}")
-
+        driver.close()
+        
 def test_add_product(driver_setup):
     """
     Test case for adding a product from the search bar to the cart.
     """
     driver = driver_setup
+    driver.get("https://nourishstore.in/")
     search_page = SearchProduct(driver)
 
     product_name = "arhar"  # Use a product name for the test
 
     # Perform search and selection
-    assert search_page.open_search_bar(), "Failed to open search barr"
+    assert search_page.open_search_bar(), "Failed to open search bar"
     assert search_page.enter_search_query(product_name), "Failed to enter search query"
     product_name_from_search = search_page.fetch_and_click_product()
 
@@ -55,12 +56,12 @@ def test_add_product(driver_setup):
     assert product_name_from_page == product_name_from_search, "Product name mismatch"
 
     # Get product prices for different weights
-    prices = search_page.add_to_cart()
+    prices = search_page.add_product_to_cart()
     assert prices, "Failed to fetch product prices"
 
     # If you want to log the prices, you can do so here
     general_logger.info(f"Prices: {prices}")
-    
+    driver.quit()
     # # Create an instance of the SearchPage class with the driver passed to it
     # search_page = SearchProduct(driver)
 
@@ -98,7 +99,8 @@ def test_add_product(driver_setup):
     #     return
         
     # Close the WebDriver
-    web_driver_setup.close_driver()
+# x = driver_setup
+# x.close_driver()
 
 # AddProductFromSearchbar('arhar')
 
