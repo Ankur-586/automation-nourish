@@ -80,11 +80,11 @@ class SearchProduct:
     def add_product_to_cart(self):
         try:
             select = Select(self.driver.find_element(By.XPATH, self.select_weight_dropdown))
-            print('qwertyuiopasdfg','after this')
             prices = []
             for idx in range(0, len(select.options)):
                 opt = select.options[idx]
                 select.select_by_index(idx)
+                print(opt.get_attribute('label'))
                 actualPrice = self.driver.find_element(By.XPATH, self.select_weight_dropdown).text
                 discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
                 prices.append({
@@ -93,8 +93,7 @@ class SearchProduct:
                 })
                 add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
                 add_to_cart.click()
-                general_logger.info(f"Product Info : {prices}")
-                return prices
+            return prices
         except Exception as e:
             exception_logger.error(f"Error fetching product price from product page: {e}")
             return None
