@@ -85,7 +85,7 @@ class SearchProduct:
                 opt = select.options[idx]
                 select.select_by_index(idx)
                 print(opt.get_attribute('label'))
-                actualPrice = self.driver.find_element(By.XPATH, self.select_weight_dropdown).text
+                actualPrice = self.driver.find_element(By.XPATH, self.actualPrice_product).text
                 discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
                 prices.append({
                     f"{opt.get_attribute('label')} actualPrice": actualPrice,

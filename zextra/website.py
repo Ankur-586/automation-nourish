@@ -80,7 +80,7 @@ def AddProductFromSearchbar(product_name: str):
         exception_logger.error(f"Error opening product page: {e}")
     
     try:
-        product_name = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1')
+        product_name = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1').text
         general_logger.info(f"Product name: {product_name}")
     except Exception as e:
         exception_logger.error(f"Error fetching product name: {e}")
@@ -95,6 +95,7 @@ def AddProductFromSearchbar(product_name: str):
     for idx in range(0, len(select.options)):
         opt = select.options[idx]
         select.select_by_index(idx)
+        print(opt.get_attribute('label'))
         actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
         discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
         prices.append({
@@ -104,7 +105,7 @@ def AddProductFromSearchbar(product_name: str):
         # print(f'Option {idx} - Actual Price: {actualPrice}, Discounted Price: {discountedPrice}')
         add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
         add_to_cart.click()
-    print(prices)
+    general_logger.info(prices)
     # print(f'Actual Price:->{} {actualPrice}, 1kg: {actualPrice}\nDiscounted Price:-> 500gm: {discountedPrice}, 1kg: {discountedPrice}')
     
     # time.sleep(8)
@@ -114,8 +115,6 @@ def AddProductFromSearchbar(product_name: str):
     # discountedPrice_1kg = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
     # add_to_cart_1kg = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
     # add_to_cart_1kg.click()
-    
-    time.sleep
     
     # print(f'Actual Price:-> 500gm: {actualPrice_500gm}, 1kg: {actualPrice_1kg}\nDiscounted Price:-> 500gm: {discountedPrice_500gm}, 1kg: {discountedPrice_1kg}')
     
