@@ -18,6 +18,7 @@ class SearchProduct:
         self.actualPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]'
         self.discountedPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]'
         self.add_to_cart = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button'
+        self.open_cart_with_product = ''
 
     def open_search_bar(self):
         try:
@@ -39,6 +40,7 @@ class SearchProduct:
             text_input.clear()
             text_input.send_keys(product_name)
             general_logger.info("Search query entered successfully")
+            time.sleep(1)
         except Exception as e:
             exception_logger.error(f"Error entering product name in search bar: {e}")
             return False
@@ -98,4 +100,7 @@ class SearchProduct:
             exception_logger.error(f"Error fetching product price from product page: {e}")
             return None
 
+    def open_cart(self):
+        pass
+    
 # x = SearchProduct

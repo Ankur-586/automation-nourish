@@ -6,14 +6,14 @@ from settings.log_setup import general_logger, exception_logger
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
 
 def AddProductFromSearchbar(product_name: str):
     
-    if not isinstance(product_name, str):
-            exception_logger.error("Product name should be a string")
-            return
+    # if not isinstance(product_name, str):
+    #         exception_logger.error("Product name should be a string")
+    #         return
 
     try:
         web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
@@ -54,7 +54,7 @@ def AddProductFromSearchbar(product_name: str):
     except Exception as e:
         exception_logger.error(f"Error entering text in the search bar: {e}")
         return
-
+    
     # Fetch product name from search results
     try:
         fetch_product_text = WebDriverWait(driver, 10).until(
@@ -69,12 +69,13 @@ def AddProductFromSearchbar(product_name: str):
     try:
         fetch_product_text.click()
         time.sleep(5)
-        expected_product_page_url = 'https://nourishstore.in/unpolished-dal/arhar-dal'
-        actual_product_page_url = driver.current_url
-        if expected_product_page_url == actual_product_page_url:
-            general_logger.info("Product page opened successfully")
-            # return 'Pass'
-        exception_logger.error("Product page did not open successfully")
+        general_logger.info("Product page opened successfully")
+        # expected_product_page_url = 'https://nourishstore.in/spices/moti-saunf'
+        # actual_product_page_url = driver.current_url
+        # if expected_product_page_url == actual_product_page_url:
+        #     general_logger.info("Product page opened successfully")
+        #     # return 'Pass'
+        # exception_logger.error("Product page did not open successfully")
         # return 'Fail'
     except Exception as e:
         exception_logger.error(f"Error opening product page: {e}")
@@ -82,30 +83,57 @@ def AddProductFromSearchbar(product_name: str):
     try:
         product_name = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1').text
         general_logger.info(f"Product name: {product_name}")
-    except Exception as e:
+    except Exception as e:  
         exception_logger.error(f"Error fetching product name: {e}")
     
     # Log that everything was successful
     general_logger.info("Product search from search bar completed successfully.")
+    time.sleep(5)
     
-    select = Select(driver.find_element(By.XPATH, ('//*[@id="select1"]')))
-    prices = []
-    # options = [opt.text for opt in select.options]
-    options = [opt.get_attribute('label') for opt in select.options]
-    for idx in range(0, len(select.options)):
-        opt = select.options[idx]
-        select.select_by_index(idx)
-        print(opt.get_attribute('label'))
-        actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
-        discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
-        prices.append({
-                f"{opt.get_attribute('label')} actualPrice": actualPrice,
-                f"{opt.get_attribute('label')} discountedPrice": discountedPrice
-            })
-        # print(f'Option {idx} - Actual Price: {actualPrice}, Discounted Price: {discountedPrice}')
-        add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
-        add_to_cart.click()
-    general_logger.info(prices)
+    # x = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span')
+    ele_structure = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]')
+    white_box = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div') 
+    general_logger.info('Inside the white Box')
+    if ele_structure:
+        if white_box:
+            try:
+                # Try finding the select element and checking if it's present
+                select_element = driver.find_element(By.XPATH, '//*[@id="select1"]')  
+                select_exists = True  # Element found, set flag to True
+            except NoSuchElementException:
+                # If element is not found, set flag to False
+                select_exists = False
+            # Case 1: when elemet exists
+            print('before if',select_exists)
+            if select_exists:
+                print('select option found')
+                select = Select(select_element)   
+                prices = [] 
+                # options = [opt.text for opt in select.options]
+                # options = [opt.get_attribute('label') for opt in select.options]    
+                for idx in range(0, len(select.options)):
+                    opt = select.options[idx]
+                    WebDriverWait(driver, 10).until(EC.visibility_of(opt))
+                    select.select_by_index(idx)
+                    print('Non-Select',opt.get_attribute('label'))
+                    actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
+                    discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
+                    prices.append({
+                            f"{opt.get_attribute('label')} actualPrice": actualPrice,
+                            f"{opt.get_attribute('label')} discountedPrice": discountedPrice
+                        })
+                    # print(f'Option {idx} - Actual Price: {actualPrice}, Discounted Price: {discountedPrice}')
+                    add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
+                    add_to_cart.click()
+                general_logger.info(prices)
+            else:
+                print('inside the else block',select_exists)
+                print('No select option found')
+                variant_text = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span').text
+                actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
+                discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
+                print(f"Variant Text: {variant_text}, Actual Price: {actualPrice}, Discounted Price: {discountedPrice}")
+            
     # print(f'Actual Price:->{} {actualPrice}, 1kg: {actualPrice}\nDiscounted Price:-> 500gm: {discountedPrice}, 1kg: {discountedPrice}')
     
     # time.sleep(8)
@@ -121,5 +149,176 @@ def AddProductFromSearchbar(product_name: str):
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    AddProductFromSearchbar('arhar')
+    AddProductFromSearchbar('moti saunf')
     
+'''
+if suppose on the first run i have a product and the product page is different which has white box and inside that we have no select element but only span with a text 
+and on the second run, supoose we have a product page which has a select then how can i perform this. 
+bascialy the product page is one. ANd its structure is asllo same. but different product renders differntly. If a project has variants then a select box is rendered and if 
+no variants then there is no slect box.
+
+# Case 1: If the select element exists, interact with it
+        if select_exists:
+            general_logger.info('Select element found (Variants available)')
+            select = Select(select_element)
+            prices = []
+
+            # Loop through the options in the select element
+            for idx in range(len(select.options)):
+                opt = select.options[idx]
+                
+                # Ensure the option is visible before interacting
+                WebDriverWait(driver, 10).until(EC.visibility_of(opt))
+                select.select_by_index(idx)
+                general_logger.info(f'Selected: {opt.get_attribute("label")}')
+
+                # Fetch prices after selecting the option
+                actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
+                discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
+                prices.append({
+                    f"{opt.get_attribute('label')} actualPrice": actualPrice,
+                    f"{opt.get_attribute('label')} discountedPrice": discountedPrice
+                })
+                
+                # Optionally, click "Add to Cart" for each option
+                add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
+                add_to_cart.click()
+
+            general_logger.info(f"Prices for all options: {prices}")
+
+        # Case 2: If no select element exists, handle the span element for text (no variants)
+        else:
+            general_logger.info('No select element found (No variants available)')
+            # Extract the text from the span element
+            variant_text = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span').text
+            actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
+            discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
+            
+            general_logger.info(f"Variant Text: {variant_text}, Actual Price: {actualPrice}, Discounted Price: {discountedPrice}")
+            print(f"Variant Text: {variant_text}, Actual Price: {actualPrice}, Discounted Price: {discountedPrice}")
+            
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\automation-nourish\zextra\website.py", line 157, in <module>
+    AddProductFromSearchbar('Moti saunf')
+  File "D:\automation-nourish\zextra\website.py", line 114, in AddProductFromSearchbar
+    WebDriverWait(driver, 10).until(EC.visibility_of(opt))
+  File "D:\automation-nourish\venv\Lib\site-packages\selenium\webdriver\support\wait.py", line 105, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+
+
+def AddProductFromSearchbar(product_name: str):
+    try:
+        web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
+        driver = web_driver_setup.setup_driver()
+        general_logger.info("WebDriver initialized successfully.")
+    except Exception as e:
+        exception_logger.error(f"Error initializing WebDriver: {e}")
+        return
+
+    # Open the website
+    try:
+        driver.get("https://nourishstore.in/")
+        general_logger.info("Navigated to nourishstore.in.")
+    except Exception as e:
+        exception_logger.error(f"Error loading website: {e}")
+        return
+
+    # Click on the search bar
+    try:
+        search_bar_click = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[3]'))
+        )
+        search_bar_click.click()
+        general_logger.info("Search bar clicked.")
+    except Exception as e:
+        exception_logger.error(f"Search Bar Exception: {e}")
+        return
+
+    # Input the search query
+    try:
+        text_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
+        )
+        text_input.send_keys(product_name)
+        general_logger.info(f"Search term {product_name} entered in the search bar.")
+    except Exception as e:
+        exception_logger.error(f"Error entering text in the search bar: {e}")
+        return
+    
+    # Fetch product name from search results
+    try:
+        fetch_product_text = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'))
+        )
+        general_logger.info(f"Fetched product: {fetch_product_text.text}")
+    except Exception as e:
+        exception_logger.error(f"Error fetching product text: {e}")
+        return
+    
+    # Click on the product to open the product page
+    try:
+        fetch_product_text.click()
+        time.sleep(5)  # Give time for the page to load
+    except Exception as e:
+        exception_logger.error(f"Error opening product page: {e}")
+        return
+
+    # Logic to check for select element or span inside the white box
+    try:
+        # Check if the white box exists (This element is always present on the page)
+        white_box = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div')
+        general_logger.info('Inside the white box')
+
+        # Check if the select element exists (this is the key part of your requirement)
+        try:
+            select_element = driver.find_element(By.XPATH, '//*[@id="select1"]')
+            select_exists = True
+        except NoSuchElementException:
+            select_exists = False
+
+        # Case 1: If the select element exists, interact with it
+        if select_exists:
+            general_logger.info('Select element found (Variants available)')
+            select = Select(select_element)
+            prices = []
+
+            # Loop through the options in the select element
+            for idx in range(len(select.options)):
+                opt = select.options[idx]
+                
+                # Ensure the option is visible before interacting
+                WebDriverWait(driver, 10).until(EC.visibility_of(opt))
+                select.select_by_index(idx)
+                general_logger.info(f'Selected: {opt.get_attribute("label")}')
+
+                # Fetch prices after selecting the option
+                actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
+                discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
+                prices.append({
+                    f"{opt.get_attribute('label')} actualPrice": actualPrice,
+                    f"{opt.get_attribute('label')} discountedPrice": discountedPrice
+                })
+                
+                # Optionally, click "Add to Cart" for each option
+                add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
+                add_to_cart.click()
+
+            general_logger.info(f"Prices for all options: {prices}")
+
+        # Case 2: If no select element exists, handle the span element for text (no variants)
+        else:
+            general_logger.info('No select element found (No variants available)')
+            # Extract the text from the span element
+            variant_text = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span').text
+            actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
+            discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
+            
+            general_logger.info(f"Variant Text: {variant_text}, Actual Price: {actualPrice}, Discounted Price: {discountedPrice}")
+            print(f"Variant Text: {variant_text}, Actual Price: {actualPrice}, Discounted Price: {discountedPrice}")
+
+    except Exception as e:
+        exception_logger.error(f"Error handling product options: {e}")
+'''

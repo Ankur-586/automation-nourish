@@ -76,4 +76,8 @@ which testing framework do you prefer for automation testing python
 
 pytest tests/ --maxfail=3 --disable-warnings --html=report.html
 
+python -m zextra.website
+
 python -m pytest
+
+ print(len(select.options))
