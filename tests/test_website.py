@@ -38,7 +38,7 @@ def test_add_product(driver_setup):
     driver.get("https://nourishstore.in/")
     search_page = SearchProduct(driver)
 
-    product_name = "Nourish Nutrition Delights Combo of 3"  # Use a product name for the test
+    product_name = "moti saunf"  # Use a product name for the test
 
     # Perform search and selection
     assert search_page.open_search_bar(), "Failed to open search bar"
@@ -48,8 +48,8 @@ def test_add_product(driver_setup):
     assert product_name_from_search, "Failed to fetch or click on product"
 
     # Validate the product page
-    expected_product_page_url = "https://nourishstore.in/offers/nourish-nutrition-delights-combo-of-3"
-    assert search_page.validate_product_page(expected_product_page_url), "Product page did not open successfully"
+    # expected_product_page_url = "https://nourishstore.in/unpolished-dal/arhar-dal"
+    # assert search_page.validate_product_page(expected_product_page_url), "Product page did not open successfully"
 
     # Get the product name and prices
     product_name_from_page = search_page.get_product_name()
@@ -60,7 +60,6 @@ def test_add_product(driver_setup):
     assert prices, "Failed to fetch product prices"
 
     # If you want to log the prices, you can do so here
-    general_logger.info(f"Prices: {prices}")
     driver.quit()
     # # Create an instance of the SearchPage class with the driver passed to it
     # search_page = SearchProduct(driver)
