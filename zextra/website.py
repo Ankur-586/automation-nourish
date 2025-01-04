@@ -57,25 +57,28 @@ def AddProductFromSearchbar(product_name: str):
     
     # Fetch product name from search results
     try:
-        print('iewwwwwwwwwwwwwoeooeoeeeeeeeoooeeeeeeeeeeebjkbkjbkjbkjkjkjbeeeeeeeeeeeeeeeeeeeeessssssssssskjjkhkjhkjhkjh')
         product_list = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul'))
+            EC.visibility_of_all_elements_located((By.XPATH, '//ul//div[contains(@class, "flex justify-between items-center")]'))
         )
+        # List to hold product names
         product_list_list = []
-        for i in range(0,len(product_list)):
-            print(i)
-            product_name = driver.find_element(By.XPATH, '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div[1]/div/div/a/p[1]').text
-            product_list_list.append([product_name])
-        print('product_listproduct_listproduct_list',product_list_list)
+        # Loop through each product element
+        for product in product_list:
+            print(f"Processing product {len(product_list)}")
+            # Assuming each product is wrapped in a div or li within the unordered list, use a dynamic XPath to select individual items
+            product_name = product.find_element(By.XPATH, './/a/p[1]').text
+            product_list_list.append([product_name])  # Add the product name to the list
+            # print(f"Product {+1} name: {product_name}")
+        # Print the complete list of product names
+        print('Product list:', product_list_list)
         # general_logger.info(f"Fetched product: {fetch_product_text.text}")
-        print('[wirdcjurqeprjperjpepqrperpoqrpouroeuiropiroqierpr85+6et+9rf7d74g+e7h9+re7h+9weh7w+98h7w+fsfsfsfsfsf9]')
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
         return
     
     # Click on the product to open the product page
     try:
-        fetch_product_text.click()
+        # fetch_product_text.click()
         time.sleep(5)
         general_logger.info("Product page opened successfully")
         # expected_product_page_url = 'https://nourishstore.in/spices/moti-saunf'
