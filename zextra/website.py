@@ -61,37 +61,32 @@ def AddProductFromSearchbar(product_name: str):
             EC.visibility_of_all_elements_located((By.XPATH, '//ul//div[contains(@class, "flex justify-between items-center")]'))
         )
         # List to hold product names
-        product_list_list = []
+        all_product_list = set()
         # Loop through each product element
         for product in product_list:
-            print(f"Processing product {len(product_list)}")
-            # Assuming each product is wrapped in a div or li within the unordered list, use a dynamic XPath to select individual items
+            #print(f"Processing product {index + 1}")  # Prints the index of the current product
             product_name = product.find_element(By.XPATH, './/a/p[1]').text
-            product_list_list.append([product_name])  # Add the product name to the list
-            # print(f"Product {+1} name: {product_name}")
-        # Print the complete list of product names
-        print('Product list:', product_list_list)
-        # general_logger.info(f"Fetched product: {fetch_product_text.text}")
+            product_link = product.find_element(By.XPATH, './/a').get_attribute('href')
+            all_product_list.add((product_name,product_link))
+        products_list = list(all_product_list)
+        products_list.sort()
+        print('Product list:', products_list)
+        # general_logger.info(f"Fetched product: {products_list}")
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
         return
     
     # Click on the product to open the product page
     try:
-        # fetch_product_text.click()
-        time.sleep(5)
-        general_logger.info("Product page opened successfully")
-        # expected_product_page_url = 'https://nourishstore.in/spices/moti-saunf'
-        # actual_product_page_url = driver.current_url
-        # if expected_product_page_url == actual_product_page_url:
-        #     general_logger.info("Product page opened successfully")
-        #     # return 'Pass'
-        # exception_logger.error("Product page did not open successfully")
-        # return 'Fail'
+        for product_name, link in products_list:
+            if product_name.lower() in product_name.lower():  # Case-insensitive search
+                print(f"Found product: {product_name}")
+                driver.get(link)
     except Exception as e:
         exception_logger.error(f"Error opening product page: {e}")
     
     try:
+        #WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//h1[text()="Product Title"]')))
         product_name = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1').text
         general_logger.info(f"Product name: {product_name}")
     except Exception as e:  
