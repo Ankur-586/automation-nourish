@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 
-def AddProductFromSearchbar(product_name: str):
+def AddProductFromSearchbar(actula_product_name: str):
     
     # if not isinstance(product_name, str):
     #         exception_logger.error("Product name should be a string")
@@ -49,8 +49,8 @@ def AddProductFromSearchbar(product_name: str):
         text_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
         )
-        text_input.send_keys(product_name)
-        general_logger.info(f"Search term {product_name} entered in the search bar.")
+        text_input.send_keys(actula_product_name)
+        general_logger.info(f"Search term {actula_product_name} entered in the search bar.")
     except Exception as e:
         exception_logger.error(f"Error entering text in the search bar: {e}")
         return
@@ -70,20 +70,12 @@ def AddProductFromSearchbar(product_name: str):
             all_product_list.add((product_name,product_link))
         products_list = list(all_product_list)
         products_list.sort()
-        print('Product list:', products_list)
-        # general_logger.info(f"Fetched product: {products_list}")
+        if actula_product_name.title() in products_list:
+            print('Found:', True)
+        general_logger.info(f"Fetched product: {products_list}")
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
         return
-    
-    # Click on the product to open the product page
-    try:
-        for product_name, link in products_list:
-            if product_name.lower() in product_name.lower():  # Case-insensitive search
-                print(f"Found product: {product_name}")
-                driver.get(link)
-    except Exception as e:
-        exception_logger.error(f"Error opening product page: {e}")
     
     try:
         #WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//h1[text()="Product Title"]')))
