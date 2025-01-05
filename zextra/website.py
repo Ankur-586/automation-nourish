@@ -131,6 +131,12 @@ if __name__ == "__main__":
     AddProductFromSearchbar('rai')
     
 '''
+https://www.w3schools.com/python/trypython.asp?filename=demo_default
+prod_list = ['Rai','Ghee','Atta']
+prod_name = 'rai'
+if prod_name.title() in prod_list:
+   print(True)
+
 if suppose on the first run i have a product and the product page is different which has white box and inside that we have no select element but only span with a text 
 and on the second run, supoose we have a product page which has a select then how can i perform this. 
 bascialy the product page is one. ANd its structure is asllo same. but different product renders differntly. If a project has variants then a select box is rendered and if 
