@@ -142,7 +142,7 @@ def AddProductFromSearchbar(actula_product_name: str):
             general_logger.info(f"Variant Text: {variant_weight}, Actual Price: {actualPrice}, Discounted Price: {discountedPrice}")
         except Exception as e:
             exception_logger.error(f"Error Fetching Single Weight: {e}")
-    
+
     try:
         pass
     except Exception as e:
@@ -152,7 +152,7 @@ def AddProductFromSearchbar(actula_product_name: str):
 
 if __name__ == "__main__":
     # striped_prod_name = input('Enter Product Name: ').strip()
-    AddProductFromSearchbar('Chana dal')
+    AddProductFromSearchbar('Nourish Nutrition Delights Combo of 3')
     
 '''
 fetch a perticular element from list and fetch it from list
