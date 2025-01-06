@@ -38,12 +38,12 @@ def test_add_product(driver_setup):
     driver.get("https://nourishstore.in/")
     search_page = SearchProduct(driver)
 
-    product_name = "moti saunf"  # Use a product name for the test
+    product_name = "rai".strip()  # Use a product name for the test
 
     # Perform search and selection
     assert search_page.open_search_bar(), "Failed to open search bar"
     assert search_page.enter_search_query(product_name), "Failed to enter search query"
-    product_name_from_search = search_page.fetch_and_click_product()
+    product_name_from_search = search_page.fetch_and_click_product(product_name)
 
     assert product_name_from_search, "Failed to fetch or click on product"
 

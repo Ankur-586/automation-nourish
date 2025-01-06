@@ -13,7 +13,9 @@ class SearchProduct:
         self.driver = driver
         self.search_bar = '/html/body/header/nav/div[3]'
         self.input_box = '//*[@id="autocompleteInput"]'
-        self.search_result = '/html/body/header/nav/div[3]/div/div/div[2]/div/ul/div/div/div/a/p[1]'
+        self.product_elements_search_bar = '//ul//div[contains(@class, "flex justify-between items-center")]'
+        self.fetched_product_name = './/a/p[1]'
+        self.fetched_product_url = './/a'
         self.product_page = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1'
         self.multiple_weight_dropdown = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/select'
         self.single_weight_nodropdown = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span'
@@ -34,43 +36,43 @@ class SearchProduct:
             return False
         return True
     
-    def enter_search_query(self, product_name):
+    def enter_search_query(self, striped_prod_name):
         try:
             text_input = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, self.input_box))
             )
             text_input.clear()
-            text_input.send_keys(product_name)
+            text_input.send_keys(striped_prod_name)
             general_logger.info("Search query entered successfully")
             time.sleep(1)
+            return True
         except Exception as e:
             exception_logger.error(f"Error entering product name in search bar: {e}")
             return False
-        return True
 
-    def fetch_and_click_product(self):
+    def fetch_and_click_product(self, striped_prod_name):
         try:
-            product = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_element_located((By.XPATH, self.search_result))
-            )
-            product_name = product.text
-            product.click()
-            general_logger.info(f"Fetched Product Name from search bar: {product_name}")
+            product_elements = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_all_elements_located((By.XPATH, self.product_elements_search_bar))
+        )
+            product_data = set()
+            for product_element in product_elements:
+                product_name = product_element.find_element(By.XPATH, self.fetched_product_name).text
+                product_link = product_element.find_element(By.XPATH, self.fetched_product_url).get_attribute('href')
+                product_data.add((product_name, product_link))
+            sorted_product_list = sorted(product_data)
+            general_logger.info(sorted_product_list)
+            expected_product_name = striped_prod_name.title()
+            for product_name, product_url in sorted_product_list:
+                if expected_product_name == product_name.title():
+                    self.driver.get(product_url)
+                    general_logger.info(f"Clicked on product: {product_name}, ({product_url})")
+                    break
+            general_logger.info(f"Fetched product: {sorted_product_list}")
             return product_name
         except Exception as e:
             exception_logger.error(f"Error fetching or clicking on product: {e}")
             return None
-    
-    def validate_product_page(self, expected_url):
-        try:
-            time.sleep(5)  # Allow the product page to load
-            actual_url = self.driver.current_url
-            if actual_url == expected_url:
-                general_logger.info(f"Product Page Opened Successfully: {actual_url}||{expected_url}")
-                return True
-        except Exception as e:
-            exception_logger.error(f"Error validating product page: {e}")
-        return False
 
     def get_product_name(self):
         try:
@@ -119,6 +121,9 @@ class SearchProduct:
                     f'{variant_weight} Actual Price': actualPrice,
                     f'{variant_weight} Discounted Price': discountedPrice
                 })
+                add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
+                add_to_cart.click()
+                general_logger.info('Product Added to cart With Single weight')
                 general_logger.info(prices)
                 return prices
         except Exception as e:
@@ -129,3 +134,15 @@ class SearchProduct:
         pass
     
 # x = SearchProduct
+'''
+def validate_product_page(self, expected_url):
+    try:
+        time.sleep(5)  # Allow the product page to load
+        actual_url = self.driver.current_url
+        if actual_url == expected_url:
+            general_logger.info(f"Product Page Opened Successfully: {actual_url}||{expected_url}")
+            return True
+    except Exception as e:
+        exception_logger.error(f"Error validating product page: {e}")
+    return False
+'''
