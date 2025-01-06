@@ -143,6 +143,11 @@ def AddProductFromSearchbar(actula_product_name: str):
         except Exception as e:
             exception_logger.error(f"Error Fetching Single Weight: {e}")
     
+    try:
+        pass
+    except Exception as e:
+        exception_logger.error(f"{e}")
+    
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
