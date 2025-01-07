@@ -102,49 +102,76 @@ def AddProductFromSearchbar(actula_product_name: str):
     general_logger.info("Product search from search bar completed successfully.")
     
     try:
-        # Try finding the select element and checking if it's present
         select_element = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/select')  
-        select_exists = True  # Element found, set flag to True
+        select_exists = True 
     except NoSuchElementException:
-        # If element is not found, set flag to False
         select_exists = False
-    # Case 1: When select element exists (variants available)
-    
-    if select_exists:
-        try:
-            general_logger.info('Multiple Weights Found')
-            select = Select(select_element)
-            prices = [] 
-            for idx in range(0, len(select.options)):
-                opt = select.options[idx]
-                WebDriverWait(driver, 10).until(EC.visibility_of(opt))
-                select.select_by_index(idx)
-                actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
-                discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
-                prices.append({
-                    f"{opt.get_attribute('label')} actualPrice": actualPrice,
-                    f"{opt.get_attribute('label')} discountedPrice": discountedPrice
-                })
-                # Add to cart logic
-                add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
-                add_to_cart.click()
-                general_logger.info(f"{opt.get_attribute('label')} of {striped_prod_name} Added to cart")
-            general_logger.info(prices)
-        except Exception as e:
-            exception_logger.error(f"Error Fetching Multiple Weights: {e}")
-    # Case 2: No select element (no variants)
+    try:
+        discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]')
+        discounted_exists = True
+    except NoSuchElementException:
+        discounted_exists = False
+    try:
+        actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]')
+        actual_exists = True
+    except NoSuchElementException:
+        actual_exists = False
+    prices = [] 
+    # Case 1: When select element exists Along with Discount.
+    if select_exists and discounted_exists and actual_exists:
+        general_logger.info('Multiple Weights Found With Discounted Price')
+        select = Select(select_element)
+        for idx in range(0, len(select.options)):
+            opt = select.options[idx]
+            WebDriverWait(driver, 10).until(EC.visibility_of(opt))
+            select.select_by_index(idx)
+            prices.append({
+                f"{opt.get_attribute('label')} actualPrice": actualPrice.text,
+                f"{opt.get_attribute('label')} discountedPrice": discountedPrice.text
+            })
+            # Add to cart logic
+            add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
+            add_to_cart.click()
+            general_logger.info(f"{opt.get_attribute('label')} of {striped_prod_name} Added to cart")
+        general_logger.info(prices)
+    # Case 2: When select exists But Discount doesn't.
+    elif select_exists and not (discounted_exists and actual_exists):
+        general_logger.info('Multiple Weights Found Without Discounted Price')
+        select = Select(select_element)
+        for idx in range(0, len(select.options)):
+            opt = select.options[idx]
+            WebDriverWait(driver, 10).until(EC.visibility_of(opt))
+            select.select_by_index(idx)
+            actualPrice_withOut_discount = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span').text
+            prices.append({
+                f"{opt.get_attribute('label')} actualPrice": actualPrice_withOut_discount,
+            })
+            add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
+            add_to_cart.click()
+        general_logger.info('Product Added to cart Without Discount')
+        general_logger.info(prices)
+    # Case 3: When select does not exists And Also Discount doesn't.
+    elif not select_exists and not (discounted_exists and actual_exists):
+        print('Condition number 3')
+        
+    # Case 4: When select does not exists But Discount does.
     else:
-        try:
-            general_logger.info('Single Weights Found')
-            variant_weight = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span').text
-            actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
-            discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
-            general_logger.info(f"Variant Text: {variant_weight}, Actual Price: {actualPrice}, Discounted Price: {discountedPrice}")
-        except Exception as e:
-            exception_logger.error(f"Error Fetching Single Weight: {e}")
+        general_logger.info('Single Weights Found With Discounted Price')
+        variant_weight = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span').text
+        prices.append({
+            f'{variant_weight} Actual Price': actualPrice.text,
+            f'{variant_weight} Discounted Price': discountedPrice.text
+                })
+        add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
+        add_to_cart.click()
+        general_logger.info('Product Added to cart With Single weight')
+        general_logger.info(prices)
 
     try:
-        pass
+        time.sleep(5)
+        cart_icon_click = driver.find_element(By.XPATH, '/html/body/header/nav/div[2]/div/div/div[2]/div[2]')
+        cart_icon_click.click()                             
+        time.sleep(5)
     except Exception as e:
         exception_logger.error(f"{e}")
     
@@ -152,7 +179,7 @@ def AddProductFromSearchbar(actula_product_name: str):
 
 if __name__ == "__main__":
     # striped_prod_name = input('Enter Product Name: ').strip()
-    AddProductFromSearchbar('Nourish Nutrition Delights Combo of 3')
+    AddProductFromSearchbar('Sunflower seeds')
     
 '''
 fetch a perticular element from list and fetch it from list
