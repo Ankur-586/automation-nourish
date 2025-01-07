@@ -152,34 +152,53 @@ def AddProductFromSearchbar(actula_product_name: str):
         general_logger.info(prices)
     # Case 3: When select does not exists And Also Discount doesn't.
     elif not select_exists and not (discounted_exists and actual_exists):
+        general_logger.info('Single Weights Found Without Discounted Price')
         print('Condition number 3')
-        
     # Case 4: When select does not exists But Discount does.
-    else:
+    elif not select_exists and discounted_exists and actual_exists:
         general_logger.info('Single Weights Found With Discounted Price')
         variant_weight = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span').text
+        # actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
+        # discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
         prices.append({
             f'{variant_weight} Actual Price': actualPrice.text,
             f'{variant_weight} Discounted Price': discountedPrice.text
-                })
+        })
         add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
         add_to_cart.click()
         general_logger.info('Product Added to cart With Single weight')
         general_logger.info(prices)
+    else:
+        # Case 5: When Add to cart button doesn't Exists Give a message and return
+        exception_logger.error('Some Weird Error Happened')
 
     try:
-        time.sleep(5)
+        driver.implicitly_wait(10)
         cart_icon_click = driver.find_element(By.XPATH, '/html/body/header/nav/div[2]/div/div/div[2]/div[2]')
-        cart_icon_click.click()                             
-        time.sleep(5)
+        cart_icon_click.click()      
+        driver.implicitly_wait(10)                   
+        proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]')
+        proceed_to_checkout_button.click()
+        driver.implicitly_wait(10)
+        try:
+            driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/divdsdsd')
+            exits = True
+        except NoSuchElementException:
+            exits = False
+            
+        if exits:
+            mobile_input_box = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/input')
+            mobile_input_box.send_keys('8884154409')
+        else:
+            print('Not Found')
     except Exception as e:
-        exception_logger.error(f"{e}")
+        exception_logger.error(f"Error in Cart Click Functionality: {e}")
     
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
     # striped_prod_name = input('Enter Product Name: ').strip()
-    AddProductFromSearchbar('Sunflower seeds')
+    AddProductFromSearchbar('Nourish Nutrition Delights Combo of 3')
     
 '''
 fetch a perticular element from list and fetch it from list
