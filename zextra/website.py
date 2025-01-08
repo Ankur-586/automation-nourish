@@ -194,6 +194,9 @@ def AddProductFromSearchbar(actula_product_name: str):
                 EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]'))
             )
             print('6 input box found')
+            entering_otp = input('Enter the otp: ')
+            
+            
         except TimeoutException:
             print('Not Found')
             
