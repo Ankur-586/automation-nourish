@@ -195,7 +195,7 @@ def AddProductFromSearchbar(actula_product_name: str):
             )
             print('6 input box found')
             entering_otp = input('Enter the otp: ')
-            
+            # /html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]/input[2]
             
         except TimeoutException:
             print('Not Found')
