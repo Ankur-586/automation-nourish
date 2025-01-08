@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 import time
 
@@ -55,7 +55,7 @@ def AddProductFromSearchbar(actula_product_name: str):
         exception_logger.error(f"Search Bar Exception: {e}")
         return
 
-    time.sleep(5)  # It's good to avoid hard waits, but leaving it here temporarily for testing purposes.
+    driver.implicitly_wait(10)    # It's good to avoid hard waits, but leaving it here temporarily for testing purposes.
 
     # Input the search query
     try:
@@ -173,24 +173,30 @@ def AddProductFromSearchbar(actula_product_name: str):
         exception_logger.error('Some Weird Error Happened')
 
     try:
-        driver.implicitly_wait(10)
         cart_icon_click = driver.find_element(By.XPATH, '/html/body/header/nav/div[2]/div/div/div[2]/div[2]')
-        cart_icon_click.click()      
-        driver.implicitly_wait(10)                   
+        cart_icon_click.click()                    
         proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]')
         proceed_to_checkout_button.click()
-        driver.implicitly_wait(10)
+
         try:
-            driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/divdsdsd')
-            exits = True
-        except NoSuchElementException:
-            exits = False
-            
-        if exits:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div'))
+            )
+            print('Found The Login/SignUp Form')
+            # Find the mobile input box and enter the mobile number
             mobile_input_box = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/input')
             mobile_input_box.send_keys('8884154409')
-        else:
+            # Click the button to submit the form
+            submit_button = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/button')
+            submit_button.click()
+            # Wait for the next input box to appear after submission
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]'))
+            )
+            print('6 input box found')
+        except TimeoutException:
             print('Not Found')
+            
     except Exception as e:
         exception_logger.error(f"Error in Cart Click Functionality: {e}")
     

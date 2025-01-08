@@ -73,6 +73,8 @@ how to get the name of all dropdown elements in selenium python
 how to get the name options of all dropdown elements in selenium python
 how to get the name options label of all dropdown elements in selenium python 
 which testing framework do you prefer for automation testing python
+how to manage otp number box in selenium python headless mode
+having too many try except causes the code to be slow 
 
 pytest tests/ --maxfail=3 --disable-warnings --html=report.html
 
