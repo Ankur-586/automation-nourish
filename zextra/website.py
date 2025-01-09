@@ -9,18 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
-import time
-
-from settings.config import WebDriverSetup
-from settings.log_setup import general_logger, exception_logger
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException
-
-def AddProductFromSearchbar(actula_product_name: str):
+def AddProductFromSearchbar(actula_product_name: str, website_url):
     
     if not isinstance(actula_product_name, str):
         exception_logger.error("Product name should be a string")
@@ -40,7 +29,7 @@ def AddProductFromSearchbar(actula_product_name: str):
     # --------------------------------------------------------------------------------------------
     # Open the website
     try:
-        driver.get("https://demo.nourishstore.in/")
+        driver.get(website_url)
         general_logger.info("Navigated to nourishstore.in.")
     except Exception as e:
         exception_logger.error(f"Error loading website: {e}")
@@ -249,8 +238,9 @@ def AddProductFromSearchbar(actula_product_name: str):
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    # striped_prod_name = input('Enter Product Name: ').strip()
-    AddProductFromSearchbar('Nourish Nutrition Delights Combo')
+    product_name = 'Nourish Nutrition Delights Combo'
+    website_url = 'https://demo.nourishstore.in/'
+    AddProductFromSearchbar(product_name, website_url)
     # run_var = AddProductFromSearchbar('Nourish Nutrition Delights Combo of 3')
     # cProfile.run(run_var)
     
