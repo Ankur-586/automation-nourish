@@ -226,6 +226,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
                 invalid_message = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/p[3]'))
                 )
+                # below code is not working as excpected. Enter a wrong otp and then check
                 if invalid_message:
                     general_logger.info('Wrong OTP')
                     for idx in range(1, 7):  # Assuming there are 6 OTP input fields
