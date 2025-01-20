@@ -30,7 +30,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
     # Open the website
     try:
         driver.get(website_url)
-        general_logger.info("Navigated to nourishstore.in.")
+        general_logger.info(f"Navigated to {website_url}")
     except Exception as e:
         exception_logger.error(f"Error loading website: {e}")
         return
@@ -240,7 +240,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
 
 if __name__ == "__main__":
     product_name = 'Nourish Nutrition Delights Combo'
-    website_url = 'https://demo.nourishstore.in/'
+    website_url = 'https://nourishstore.in/'
     AddProductFromSearchbar(product_name, website_url)
     # run_var = AddProductFromSearchbar('Nourish Nutrition Delights Combo of 3')
     # cProfile.run(run_var)
