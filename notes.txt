@@ -83,3 +83,5 @@ python -m zextra.website
 python -m pytest
 
  print(len(select.options))
+
+playwright
