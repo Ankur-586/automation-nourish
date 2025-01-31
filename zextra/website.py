@@ -181,8 +181,10 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
         cart_icon_click = driver.find_element(By.XPATH, '/html/body/header/nav/div[2]/div/div/div[2]/div[2]')
         cart_icon_click.click()
         general_logger.info("Cart Icon Clicked")                    
-        # proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]') # For Live website
-        proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:Rqjk6cq:"]/div[2]/div[3]') # for development website
+        if website_url == 'https://nourishstore.in/':
+            proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]') # For Live website
+        else:
+            proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:Rqjk6cq:"]/div[2]/div[3]') # for development website
         proceed_to_checkout_button.click()
         general_logger.info("Proceed To Checkout Button Clicked")   
     except Exception as e:
@@ -235,11 +237,13 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
     except TimeoutException:
         exception_logger.error('Element Not Found')
     # --------------------------------------------------------------------------------------------
+    cart_title = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div/div[1]/div[1]/h2')
+    print('cart_title',cart_title)
     
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    product_name = 'Nourish Nutrition Delights Combo'
+    product_name = 'Nourish Nutrition Delights Combo of 3'
     website_url = 'https://nourishstore.in/'
     AddProductFromSearchbar(product_name, website_url)
     # run_var = AddProductFromSearchbar('Nourish Nutrition Delights Combo of 3')
