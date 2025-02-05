@@ -36,7 +36,11 @@ Packages:
 pip install selenium
 pip install fake-useragent
 pip install pytest
+
+For Reports:
+------------
 pip install pytest-html
+pip install allure-pytest
 -----------------------------------
 
 i am developing a automation script for automating webisite testing. 
@@ -44,10 +48,6 @@ i want is after developing the scripts and after deployment. I want
 that if i write test cases and deploy them then the testing should 
 happend according to it and automatically.
 
-
-The Complete 2024 Software Testing Bootcamp
-
-how do i do automation testing using python according to industry standards
 
 my_project/      
 ├── settings/
@@ -82,6 +82,28 @@ python -m zextra.website
 
 python -m pytest
 
- print(len(select.options))
+print(len(select.options))
 
 playwright
+
+
+
+give me a pom structure a project which is being build for ecooerce websute automation testing in python
+
+
+-----------------------------------------------------------------------------------------------
+Commands:
+---------
+To run test with allure : python -m pytest --alluredir allure-results 
+                          -------------------------------------------
+
+To run test with pytestHtml : python -m pytest --maxfail=3 --disable-warnings --html=report.html
+                              ------------------------------------------------------------------
+
+To convert the allure to report version : allure serve D:\automation-nourish\allure-results
+                                          -------------------------------------------------
+
+To get allure version : allure --version
+
+Allure-github : https://github.com/allure-framework/allure2/releases
+------------------------------------------------------------------------------------------------
