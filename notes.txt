@@ -97,8 +97,27 @@ class LoginWindow:
         except Exception as e:
             exception_logger.error(f"Error opening Login Pop Up Window Click {e}")
     
-    def get_login_window(self):
-        pass
+    def get_login_window(self, input_field_mobile):
+        try:
+            login_window = self.wait_for_element(By.CSS_SELECTOR, self.loginWindow_button)
+            login_window.click()
+            pop_window = self.wait_for_element(By.XPATH, self.loginpopWindow)
+            if pop_window:
+                general_logger.info('Found The Login/SignUp Form')
+                mobile_input_box = self.driver.find_element(By.XPATH, self.mobile_input_box)
+                mobile_input_box.send_keys(input_field_mobile)
+                next_button = self.driver.find_element(By.XPATH, self.submit_button)
+                if next_button.is_enabled() and next_button.is_displayed():
+                    next_button.click()
+                    general_logger.info("Next Button was clicked!")
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        except Exception as e:
+            exception_logger.error(f"Login Pop Up Window Not Found: {e}")
+            return False
 
 And inside the test_loginWindow.py i have below code:
 from settings.config import WebDriverSetup
@@ -133,6 +152,17 @@ def test_openloginWindow(driver_setup):
     Openlogin_window = LoginWindow(driver)
     true_status = Openlogin_window.login_window()
     assert true_status == True, "PASSED"
+
+def test_valid_mobile_number(driver_setup):
+    """
+    Test case for valid mobile number input in the login form.
+    """
+    driver = driver_setup
+    driver.get("https://nourishstore.in/")
+    login_window = LoginWindow(driver)
+    mobile_number = "8884154409"  # Replace with a valid mobile number for your test
+    result = login_window.get_login_window(mobile_number)
+    assert result is True, "Login pop-up did not function correctly with valid mobile number." 
 
 Now what i what i want to ask if the way is correct?
 if i dont return true from open_login_window then what can

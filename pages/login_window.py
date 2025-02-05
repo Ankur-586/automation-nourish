@@ -43,7 +43,7 @@ class LoginWindow:
                 general_logger.info('Found The Login/SignUp Form')
                 mobile_input_box = self.driver.find_element(By.XPATH, self.mobile_input_box)
                 mobile_input_box.send_keys(input_field_mobile)
-                next_button = self.driver.find_element(By.XPATH, self.submit_button)
+                next_button = self.driver.find_element(By.XPATH, self.next_button)
                 if next_button.is_enabled() and next_button.is_displayed():
                     next_button.click()
                     general_logger.info("Next Button was clicked!")
