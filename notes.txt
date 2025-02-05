@@ -43,12 +43,23 @@ pip install pytest-html
 pip install allure-pytest
 -----------------------------------
 
-i am developing a automation script for automating webisite testing. 
-i want is after developing the scripts and after deployment. I want 
-that if i write test cases and deploy them then the testing should 
-happend according to it and automatically.
+Search Terms:
+-------------
+-> how to get the name of all dropdown elements in selenium python
+-> how to get the name options of all dropdown elements in selenium python
+-> how to get the name options label of all dropdown elements in selenium python 
+-> which testing framework do you prefer for automation testing python
+-> how to manage otp number box in selenium python headless mode
+-> having too many try except causes the code to be slow?
+-> i am developing a automation script for automating webisite testing. 
+   i want is after developing the scripts and after deployment. I want 
+   that if i write test cases and deploy them then the testing should 
+   happend according to it and automatically.
+-> Provide the structure for a project that is being developed for e-commerce 
+   website automation testing using Python and pytest.
 
-
+------------------------------------------------------------------------
+This is my POM Structure:
 my_project/      
 ├── settings/
 │   ├── __init__.py
@@ -56,44 +67,85 @@ my_project/
 │   ├── test.py
 │   └── log_config.json
 └── pages
-│   └── website.py    
+│   └── login_window.py    
 └── tests/
-    └── test_website.py   
+    └── test_loginWindow.py   
 
+And i have below code in pages/login_window.py
+import time
 
-run: python -m tests.test_website
+from settings.log_setup import general_logger, exception_logger
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 
-prices = [['163.00', '125.63'], ['315.00', '257.25']]
-actualPrice, discountedPrice = [item for sublist in prices for item in sublist]
-print(f'Actual Price:-> 500gm: {actualPrice[0]}, 1kg: {actualPrice[1]}\nDiscounted Price:-> 500gm: {discountedPrice[0]}, 1kg: {discountedPrice[1]}')
+class LoginWindow:
+    def __init__(self, driver):
+        self.driver = driver
+        self.loginWindow = '.align-bottom svg' 
+    
+    def open_login_window(self):
+        try:
+            login_window = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.loginWindow))
+            )
+            login_window.click()
+            general_logger.info("Login Pop Up Window Click")
+            return True
+        except Exception as e:
+            exception_logger.error(f"Error opening Login Pop Up Window Click {e}")
+    
+    def get_login_window(self):
+        pass
 
-search terms:
-how to get the name of all dropdown elements in selenium python
-how to get the name options of all dropdown elements in selenium python
-how to get the name options label of all dropdown elements in selenium python 
-which testing framework do you prefer for automation testing python
-how to manage otp number box in selenium python headless mode
-having too many try except causes the code to be slow 
+And inside the test_loginWindow.py i have below code:
+from settings.config import WebDriverSetup
+from settings.log_setup import general_logger, exception_logger
 
-pytest tests/ --maxfail=3 --disable-warnings --html=report.html
+from pages.login_window import LoginWindow
 
-python -m zextra.website
+import pytest
 
-python -m pytest
+@pytest.fixture()
+def driver_setup():
+    """
+    This fixture sets up the WebDriver and performs product search actions.
+    """
+    web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
+    driver = web_driver_setup.setup_driver()
+    yield driver  
+    
+def test_open_webSite(driver_setup):
+    driver = driver_setup
+    try:
+        driver.get("https://nourishstore.in/")
+        general_logger.info("Navigated to nourishstore.in")
+    except Exception as e:
+        exception_logger.error(f"Error loading website: {e}")
+        pytest.fail(f"Failed to load website: {e}")
+        driver.close()
+        
+def test_openloginWindow(driver_setup):
+    driver = driver_setup
+    driver.get("https://nourishstore.in/")
+    Openlogin_window = LoginWindow(driver)
+    true_status = Openlogin_window.login_window()
+    assert true_status == True, "PASSED"
 
-print(len(select.options))
-
-playwright
-
-
-
-give me a pom structure a project which is being build for ecooerce websute automation testing in python
+Now what i what i want to ask if the way is correct?
+if i dont return true from open_login_window then what can
+i do?
+----------------------------------------------------------------------
 
 
 -----------------------------------------------------------------------------------------------
 Commands:
 ---------
+To run the codes from zextra folder : python -m zextra.website
+                                      -------------------------
+
 To run test with allure : python -m pytest --alluredir allure-results 
                           -------------------------------------------
 

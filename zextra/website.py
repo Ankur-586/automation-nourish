@@ -194,7 +194,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
     try:
         # login/signup Pop-upBox
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div'))
+            EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div')) 
         )
         general_logger.info('Found The Login/SignUp Form')
         
