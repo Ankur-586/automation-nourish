@@ -41,6 +41,9 @@ For Reports:
 ------------
 pip install pytest-html
 pip install allure-pytest
+
+To Run Tests in parallel:
+With pytest: You can use the pytest-xdist plugin to run tests in parallel.
 -----------------------------------
 
 Search Terms:
@@ -182,10 +185,21 @@ To run test with allure : python -m pytest --alluredir allure-results
 To run test with pytestHtml : python -m pytest --maxfail=3 --disable-warnings --html=report.html
                               ------------------------------------------------------------------
 
-To convert the allure to report version : allure serve D:\automation-nourish\allure-results
+To convert the allure to report version : allure serve allure-results
                                           -------------------------------------------------
 
 To get allure version : allure --version
 
 Allure-github : https://github.com/allure-framework/allure2/releases
 ------------------------------------------------------------------------------------------------
+
+test flows:
+
+1. search bar flow:
+   (a) search a product in the the search bar, click the add button and check the cart functionality.
+   (b) search a product and verfiy that the 
+
+search with valid text
+search with number
+search with number
+ 

@@ -112,7 +112,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
     except NoSuchElementException:
         actual_exists = False
     prices = [] 
-    # Case 1: When select element exists Along with Discount.
+    # Case 1: When select element exists Along with Discount. Product Example: Arhar/Toor Dal
     if select_exists and discounted_exists and actual_exists:
         general_logger.info('Multiple Weights Found With Discounted Price')
         select = Select(select_element)
@@ -129,7 +129,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
             add_to_cart.click()
             general_logger.info(f"{opt.get_attribute('label')} of {striped_prod_name} Added to cart")
         general_logger.info(prices)
-    # Case 2: When select exists But Discount doesn't.
+    # Case 2: When select exists But Discount doesn't. Product Example: Spiral Pasta
     elif select_exists and not (discounted_exists and actual_exists):
         general_logger.info('Multiple Weights Found Without Discounted Price')
         select = Select(select_element)
@@ -145,7 +145,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
             add_to_cart.click()
         general_logger.info('Product Added to cart Without Discount')
         general_logger.info(prices)
-    # Case 3: When select does not exists And Also Discount doesn't.
+    # Case 3: When select does not exists And Also Discount doesn't. Product Example: Moti Elaichi
     elif not select_exists and not (discounted_exists and actual_exists):
         general_logger.info('Single Weights Found Without Discounted Price')
         variant_weight = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span').text
@@ -157,7 +157,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
         add_to_cart.click()
         general_logger.info(f"{variant_weight} of {striped_prod_name} Added to cart")
         general_logger.info(prices)
-    # Case 4: When select does not exists But Discount does.
+    # Case 4: When select does not exists But Discount does. Product Example: Rai 
     elif not select_exists and discounted_exists and actual_exists:
         general_logger.info('Single Weights Found With Discounted Price')
         variant_weight = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span').text
