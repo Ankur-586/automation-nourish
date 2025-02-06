@@ -119,8 +119,6 @@ class SearchProduct:
                 opt = select.options[idx]
                 WebDriverWait(self.driver, 10).until(EC.visibility_of(opt))
                 select.select_by_index(idx)
-                # actualPrice = self.driver.find_element(By.XPATH, self.actualPrice_product).text
-                # discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
                 prices.append({
                     f"{opt.get_attribute('label')} actualPrice": actualPrice.text,
                     f"{opt.get_attribute('label')} discountedPrice": discountedPrice.text

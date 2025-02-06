@@ -19,7 +19,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
         
     # --------------------------------------------------------------------------------------------
     try:
-        web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
+        web_driver_setup = WebDriverSetup(headless=False)  # Change to True for headless mode
         driver = web_driver_setup.setup_driver()
         general_logger.info("WebDriver initialized successfully.")
     except Exception as e:
@@ -77,10 +77,13 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
         general_logger.info(f"Fetched product: {sorted_product_list}")
         expected_product_name = striped_prod_name.title()
         for product_name, product_url in sorted_product_list:
-            if expected_product_name == product_name.title():
-                driver.get(product_url)
-                general_logger.info(f"Clicked on product: {product_name}, ({product_url})")
-                break
+            if not expected_product_name == product_name.title():
+                general_logger.info(f"Exiting")
+                return 
+            driver.get(product_url)
+            general_logger.info(f"Clicked on product: {product_name}, ({product_url})")
+            break
+            
     except Exception as e:
         exception_logger.error(f"Error fetching product text: {e}")
         return
@@ -174,76 +177,76 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
     else:
         # Case 5: When Add to cart button doesn't Exists Give a message and return
         exception_logger.error('Some Weird Error Happened')
+    time.sleep(5)
+    # # --------------------------------------------------------------------------------------------
+    # # Cart Icon
+    # try:
+    #     cart_icon_click = driver.find_element(By.XPATH, '/html/body/header/nav/div[2]/div/div/div[2]/div[2]')
+    #     cart_icon_click.click()
+    #     general_logger.info("Cart Icon Clicked")                    
+    #     if website_url == 'https://nourishstore.in/':
+    #         proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]') # For Live website
+    #     else:
+    #         proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:Rqjk6cq:"]/div[2]/div[3]') # for development website
+    #     proceed_to_checkout_button.click()
+    #     general_logger.info("Proceed To Checkout Button Clicked")   
+    # except Exception as e:
+    #     exception_logger.error(f"Error in Cart Click Functionality: {e}")
         
+    # # --------------------------------------------------------------------------------------------
+    # try:
+    #     # login/signup Pop-upBox
+    #     WebDriverWait(driver, 10).until(
+    #         EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div')) 
+    #     )
+    #     general_logger.info('Found The Login/SignUp Form')
+        
+    #     # Find the mobile input box and enter the mobile number
+    #     mobile_input_box = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/input')
+    #     mobile_input_box.send_keys('8884154409')
+        
+    #     # Click the button to submit the form
+    #     submit_button = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/button')
+    #     if submit_button.is_enabled() and submit_button.is_displayed():
+    #         submit_button.click()
+    #         general_logger.info("Next Button was clicked!")
+        
+    #     # Wait for the next input box to appear after submission
+    #     WebDriverWait(driver, 10).until(
+    #         EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]'))
+    #     )
+    #     while True:
+    #         entering_otp = input('Enter the otp: ')
+    #         if len(entering_otp) != 6 or not entering_otp.isdigit():
+    #             print("Invalid OTP! Please enter exactly 6 numeric digits.")
+    #             continue
+    #         else:
+    #             for idx, otp_num in enumerate(entering_otp, start=1):
+    #                 input_box =  driver.find_element(By.XPATH, f'/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]/input[{idx}]')
+    #                 input_box.send_keys(otp_num)
+    #                 general_logger.info(f'Box Number {idx}, OTP Number: {otp_num}')
+    #             otp_submit_button = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/button')
+    #             otp_submit_button.click()
+    #             general_logger.info('Correct OTP! Please Procceed Further')
+    #             invalid_message = WebDriverWait(driver, 10).until(
+    #                 EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/p[3]'))
+    #             )
+    #             # below code is not working as excpected. Enter a wrong otp and then check
+    #             if invalid_message:
+    #                 general_logger.info('Wrong OTP')
+    #                 for idx in range(1, 7):  # Assuming there are 6 OTP input fields
+    #                     input_box_clear = driver.find_element(By.XPATH, f'/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]/input[{idx}]')
+    #                     input_box_clear.clear()  # Clear the OTP input field
+    # except TimeoutException:
+    #     exception_logger.error('Element Not Found')
     # --------------------------------------------------------------------------------------------
-    # Cart Icon
-    try:
-        cart_icon_click = driver.find_element(By.XPATH, '/html/body/header/nav/div[2]/div/div/div[2]/div[2]')
-        cart_icon_click.click()
-        general_logger.info("Cart Icon Clicked")                    
-        if website_url == 'https://nourishstore.in/':
-            proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]') # For Live website
-        else:
-            proceed_to_checkout_button = driver.find_element(By.XPATH, '//*[@id="headlessui-tabs-panel-:Rqjk6cq:"]/div[2]/div[3]') # for development website
-        proceed_to_checkout_button.click()
-        general_logger.info("Proceed To Checkout Button Clicked")   
-    except Exception as e:
-        exception_logger.error(f"Error in Cart Click Functionality: {e}")
-        
-    # --------------------------------------------------------------------------------------------
-    try:
-        # login/signup Pop-upBox
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div')) 
-        )
-        general_logger.info('Found The Login/SignUp Form')
-        
-        # Find the mobile input box and enter the mobile number
-        mobile_input_box = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/input')
-        mobile_input_box.send_keys('8884154409')
-        
-        # Click the button to submit the form
-        submit_button = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/button')
-        if submit_button.is_enabled() and submit_button.is_displayed():
-            submit_button.click()
-            general_logger.info("Next Button was clicked!")
-        
-        # Wait for the next input box to appear after submission
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]'))
-        )
-        while True:
-            entering_otp = input('Enter the otp: ')
-            if len(entering_otp) != 6 or not entering_otp.isdigit():
-                print("Invalid OTP! Please enter exactly 6 numeric digits.")
-                continue
-            else:
-                for idx, otp_num in enumerate(entering_otp, start=1):
-                    input_box =  driver.find_element(By.XPATH, f'/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]/input[{idx}]')
-                    input_box.send_keys(otp_num)
-                    general_logger.info(f'Box Number {idx}, OTP Number: {otp_num}')
-                otp_submit_button = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/button')
-                otp_submit_button.click()
-                general_logger.info('Correct OTP! Please Procceed Further')
-                invalid_message = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/p[3]'))
-                )
-                # below code is not working as excpected. Enter a wrong otp and then check
-                if invalid_message:
-                    general_logger.info('Wrong OTP')
-                    for idx in range(1, 7):  # Assuming there are 6 OTP input fields
-                        input_box_clear = driver.find_element(By.XPATH, f'/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]/input[{idx}]')
-                        input_box_clear.clear()  # Clear the OTP input field
-    except TimeoutException:
-        exception_logger.error('Element Not Found')
-    # --------------------------------------------------------------------------------------------
-    cart_title = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div/div[1]/div[1]/h2')
-    print('cart_title',cart_title)
+    # cart_title = driver.find_element(By.XPATH, '/html/body/header/nav/div[4]/div/div[1]/div[1]/h2')
+    # print('cart_title',cart_title)
     
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    product_name = 'Nourish Nutrition Delights Combo of 3'
+    product_name = 'ghee'
     website_url = 'https://nourishstore.in/'
     AddProductFromSearchbar(product_name, website_url)
     # run_var = AddProductFromSearchbar('Nourish Nutrition Delights Combo of 3')

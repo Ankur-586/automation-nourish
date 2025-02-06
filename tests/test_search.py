@@ -40,7 +40,7 @@ def test_add_product(driver_setup):
 
     # driver.implicitly_wait(10)
     
-    product_name = "Kalonji".strip()  # Use a product name for the test
+    product_name = "Pure Desi Ghee".strip()  # Use a product name for the test
 
     # Perform search and selection
     assert search_page.open_search_bar() is True, "Failed to open search bar"
