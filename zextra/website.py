@@ -15,11 +15,11 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
         exception_logger.error("Product name should be a string")
         return
     else:
-        striped_prod_name = actula_product_name.strip()
+        striped_prod_name = actula_product_name.strip().title()
         
     # --------------------------------------------------------------------------------------------
     try:
-        web_driver_setup = WebDriverSetup(headless=False)  # Change to True for headless mode
+        web_driver_setup = WebDriverSetup(headless=True)  # Change to True for headless mode
         driver = web_driver_setup.setup_driver()
         general_logger.info("WebDriver initialized successfully.")
     except Exception as e:
@@ -48,45 +48,54 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
         return
     
     # --------------------------------------------------------------------------------------------
-    driver.implicitly_wait(10) 
+    # driver.implicitly_wait(10) 
     
     # --------------------------------------------------------------------------------------------
     # Input the search query
-    try:
-        text_input = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
-        )
-        text_input.send_keys(striped_prod_name)
-        general_logger.info(f"Search term {striped_prod_name} entered in the search bar.")
-    except Exception as e:
-        exception_logger.error(f"Error entering text in the search bar: {e}")
-        return
+    # try:
+    text_input = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
+    )
+    text_input.send_keys(striped_prod_name)
+    general_logger.info(f"Search term {striped_prod_name} entered in the search bar.")
+    search_result = WebDriverWait(driver, 10).until(
+        EC.presence_of_all_elements_located((By.XPATH, "/html/body/header/nav/div[3]/div/div/div[2]"))
+    )
+    if not search_result:
+        general_logger.info(f"No results found for {striped_prod_name}.")
+        return 
+    # except Exception as e:
+    #     exception_logger.error(f"Error during search operation: {e}")
+    #     return
     
     # --------------------------------------------------------------------------------------------
     # Fetch product name from search results
-    try:
-        product_elements = WebDriverWait(driver, 10).until(
-            EC.visibility_of_all_elements_located((By.XPATH, '//ul//div[contains(@class, "flex justify-between items-center")]'))
-        )
-        product_data = set()
-        for product_element in product_elements:
-            product_name = product_element.find_element(By.XPATH, './/a/p[1]').text
-            product_link = product_element.find_element(By.XPATH, './/a').get_attribute('href')
-            product_data.add((product_name, product_link))
-        sorted_product_list = sorted(product_data)
-        general_logger.info(f"Fetched product: {sorted_product_list}")
-        expected_product_name = striped_prod_name.title()
-        for product_name, product_url in sorted_product_list:
-            if not expected_product_name == product_name.title():
-                general_logger.info(f"Exiting")
-                return 
+    # try:
+    product_elements = WebDriverWait(driver, 10).until(
+        EC.visibility_of_all_elements_located((By.XPATH, '//ul//div[contains(@class, "flex justify-between items-center")]'))
+    )
+    product_data = set()
+    for product_element in product_elements:
+        product_name = product_element.find_element(By.XPATH, './/a/p[1]').text
+        product_link = product_element.find_element(By.XPATH, './/a').get_attribute('href')
+        product_data.add((product_name, product_link))
+    sorted_product_list = sorted(product_data)
+    general_logger.info(f"Fetched product: {sorted_product_list}")
+    match_found = False
+    for product_name, product_url in sorted_product_list:
+        if striped_prod_name in product_name:
+            match_found = True
+            general_logger.info(f"Product match found: {product_name}")
             driver.get(product_url)
-            general_logger.info(f"Clicked on product: {product_name}, ({product_url})")
-            break
+            general_logger.info(f"Clicked on product: {product_name}, URL: {product_url}")
+    # If no match was found after checking all products
+    if not match_found:
+        general_logger.info("No matching product found.")
+        return 
             
-    except Exception as e:
-        exception_logger.error(f"Error fetching product text: {e}")
-        return
+    # except Exception as e:
+    #     exception_logger.error(f"Error fetching product text: {e}")
+    #     return
     
     # --------------------------------------------------------------------------------------------
     try:
@@ -105,16 +114,17 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
     except NoSuchElementException:
         select_exists = False
     try:
-        discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]')
+        discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
         discounted_exists = True
     except NoSuchElementException:
         discounted_exists = False
     try:
-        actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]')
+        actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
         actual_exists = True
     except NoSuchElementException:
         actual_exists = False
     prices = [] 
+    
     # Case 1: When select element exists Along with Discount. Product Example: Arhar/Toor Dal
     if select_exists and discounted_exists and actual_exists:
         general_logger.info('Multiple Weights Found With Discounted Price')
@@ -124,14 +134,15 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
             WebDriverWait(driver, 10).until(EC.visibility_of(opt))
             select.select_by_index(idx)
             prices.append({
-                f"{opt.get_attribute('label')} actualPrice": actualPrice.text,
-                f"{opt.get_attribute('label')} discountedPrice": discountedPrice.text
+                f"{opt.get_attribute('label')} actualPrice": actualPrice,
+                f"{opt.get_attribute('label')} discountedPrice": discountedPrice
             })
             # Add to cart logic
             add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
             add_to_cart.click()
             general_logger.info(f"{opt.get_attribute('label')} of {striped_prod_name} Added to cart")
         general_logger.info(prices)
+    
     # Case 2: When select exists But Discount doesn't. Product Example: Spiral Pasta
     elif select_exists and not (discounted_exists and actual_exists):
         general_logger.info('Multiple Weights Found Without Discounted Price')
@@ -148,6 +159,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
             add_to_cart.click()
         general_logger.info('Product Added to cart Without Discount')
         general_logger.info(prices)
+    
     # Case 3: When select does not exists And Also Discount doesn't. Product Example: Moti Elaichi
     elif not select_exists and not (discounted_exists and actual_exists):
         general_logger.info('Single Weights Found Without Discounted Price')
@@ -160,6 +172,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
         add_to_cart.click()
         general_logger.info(f"{variant_weight} of {striped_prod_name} Added to cart")
         general_logger.info(prices)
+    
     # Case 4: When select does not exists But Discount does. Product Example: Rai 
     elif not select_exists and discounted_exists and actual_exists:
         general_logger.info('Single Weights Found With Discounted Price')
@@ -167,17 +180,17 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
         # actualPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]').text
         # discountedPrice = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]').text
         prices.append({
-            f'{variant_weight} Actual Price': actualPrice.text,
-            f'{variant_weight} Discounted Price': discountedPrice.text
+            f'{variant_weight} Actual Price': actualPrice,
+            f'{variant_weight} Discounted Price': discountedPrice
         })
         add_to_cart = driver.find_element(By.XPATH, '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button')
         add_to_cart.click()
         general_logger.info('Product Added to cart With Single weight With Discount')
         general_logger.info(prices)
+    
     else:
         # Case 5: When Add to cart button doesn't Exists Give a message and return
         exception_logger.error('Some Weird Error Happened')
-    time.sleep(5)
     # # --------------------------------------------------------------------------------------------
     # # Cart Icon
     # try:
@@ -246,7 +259,7 @@ def AddProductFromSearchbar(actula_product_name: str, website_url):
     web_driver_setup.close_driver()
 
 if __name__ == "__main__":
-    product_name = 'ghee'
+    product_name = 'dlia'
     website_url = 'https://nourishstore.in/'
     AddProductFromSearchbar(product_name, website_url)
     # run_var = AddProductFromSearchbar('Nourish Nutrition Delights Combo of 3')
@@ -268,4 +281,21 @@ bascialy the product page is one. ANd its structure is asllo same. but different
 no variants then there is no slect box.
 in this page i have a product secetion in which i am trying to selects or identity the elemtns but also in that page a crousol is being displayed which also contains '//*[@id="select1"]'
 element. ANd basically why i am telling you is becasue you can understand right?
+
+# Input the search query
+    try:
+        text_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="autocompleteInput"]'))
+        )
+        text_input.send_keys(striped_prod_name)
+        general_logger.info(f"Search term {striped_prod_name} entered in the search bar.")
+        search_result = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.XPATH, '//*[@class="searchResult"]'))
+        )
+        if not search_result:
+            general_logger.info(f"No results found for {striped_prod_name}.")
+            return "No results found"
+    except Exception as e:
+        exception_logger.error(f"Error during search operation: {e}")
+        return "Search failed due to an exception"
 '''

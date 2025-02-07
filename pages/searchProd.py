@@ -97,13 +97,13 @@ class SearchProduct:
             select_exists = False
             
         try:
-            actualPrice = self.driver.find_element(By.XPATH, self.actualPrice_product)
+            actualPrice = self.driver.find_element(By.XPATH, self.actualPrice_product).text
             actual_exists = True
         except NoSuchElementException:
             actual_exists = False
             
         try:
-            discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product)
+            discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
             discounted_exists = True
         except NoSuchElementException:
             discounted_exists = False
@@ -120,8 +120,8 @@ class SearchProduct:
                 WebDriverWait(self.driver, 10).until(EC.visibility_of(opt))
                 select.select_by_index(idx)
                 prices.append({
-                    f"{opt.get_attribute('label')} actualPrice": actualPrice.text,
-                    f"{opt.get_attribute('label')} discountedPrice": discountedPrice.text
+                    f"{opt.get_attribute('label')} actualPrice": actualPrice,
+                    f"{opt.get_attribute('label')} discountedPrice": discountedPrice
                 })
                 add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
                 add_to_cart.click()
@@ -162,7 +162,7 @@ class SearchProduct:
         # Case 4: When select does not exists But Discount does. Product Example: Rai 
         elif not select_exists and discounted_exists and actual_exists:
             general_logger.info('Single Weights Found With Discounted Price')
-            variant_weight = self.driver.find_element(By.XPATH, self.single_weight_nodropdown).text
+            variant_weight = self.driver.find_element(By.XPATH, self.single_weight_nodropdown)
             prices.append({
                 f'{variant_weight} Actual Price': actualPrice.text,
                 f'{variant_weight} Discounted Price': discountedPrice.text
