@@ -81,3 +81,4 @@ if __name__ == "__main__":
     
 # ----------------------------------------------------
 # selenium get status code python 
+# https://gist.github.com/LeMoussel/bfed69044cb65947a4e63c76f11e6e1f#file-chromedriver_get_response-py-L14
