@@ -3,3 +3,9 @@ pip freeze > requirements.txt
 pip install playwright
 
 playwright install
+
+------------------------------------------------------
+Search Text: playwright loop through elements python
+
+https://jonathansoma.com/everything/scraping/loops-in-playwright/
+------------------------------------------------------
