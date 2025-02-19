@@ -9,3 +9,13 @@ Search Text: playwright loop through elements python
 
 https://jonathansoma.com/everything/scraping/loops-in-playwright/
 ------------------------------------------------------
+
+python -m python-with-playwright.main
+
+In my company, they were trying to introduce a free product with a cart value of 999. 
+The implementation was being done for both mobile and web platforms. When checking the 
+carts individually, it was working fine. However, when adding a product from the mobile 
+cart and then checking it on the web, it caused issues. I identified the problem and felt 
+satisfied with having noticed it.
+
+"I was most satisfied in my job as a QA Test Engineer when I successfully identified a critical bug during the final stages of testing that could have impacted a major product release. I collaborated closely with the development team to troubleshoot and fix the issue quickly, ensuring that the product was released without any setbacks. It was a moment where my attention to detail, problem-solving skills, and ability to work under pressure were key to the team’s success. Additionally, I felt great satisfaction when my testing efforts helped improve the overall quality of the product, and I received positive feedback from both developers and end-users."

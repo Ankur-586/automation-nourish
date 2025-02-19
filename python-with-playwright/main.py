@@ -10,15 +10,15 @@ def website_search(site_url):
         page.fill('#autocompleteInput', 'Rice')
         page.wait_for_timeout(1000)
         
-        locator = page.locator("//ul//div[contains(@class, 'flex justify-between items-center')]").all()
-        # locator.wait_for(state="visible")  # wait for the element to be visible
+        prod_locator = page.locator("//ul//div[contains(@class, 'flex justify-between items-center')]")
+        prod_locator.first.wait_for(state="visible")  # wait for the element to be visible
         # x = page.getByText('//ul//div[contains(@class, "flex justify-between items-center")]')
-        for link in locator:
+        for link in prod_locator.all():
             text = link.text_content()
-            href = link.get_attribute('href')
+            product_url = link.locator("a").get_attribute('href')
 
             print("Link text is", text)
-            print("Link URL is", href)
+            print("Link URL is", product_url)
         
         # locator = page.locator("//ul//div[contains(@class, 'flex justify-between items-center')]")
         # count = locator.count()
