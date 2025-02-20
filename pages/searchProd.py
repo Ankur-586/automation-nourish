@@ -23,7 +23,8 @@ class SearchProduct:
         self.actualPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]'
         self.discountedPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]'
         self.add_to_cart = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button'
-        # self.open_cart_with_product = ''
+        self.open_cart_with_product = '/html/body/header/nav/div[2]/div/div/div[2]/div[2]'
+        self.proceed_to_checkout = '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]'
 
     def wait_for_element(self, by, locator, timeout=10):
         try:
@@ -164,8 +165,8 @@ class SearchProduct:
             general_logger.info('Single Weights Found With Discounted Price')
             variant_weight = self.driver.find_element(By.XPATH, self.single_weight_nodropdown)
             prices.append({
-                f'{variant_weight} Actual Price': actualPrice.text,
-                f'{variant_weight} Discounted Price': discountedPrice.text
+                f'{variant_weight} Actual Price': actualPrice,
+                f'{variant_weight} Discounted Price': discountedPrice
             })
             add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
             add_to_cart.click()
@@ -180,7 +181,17 @@ class SearchProduct:
             exception_logger.error('Some Weird Error happend')
 
     def open_cart(self):
-        pass
+        try:
+            cart_icon = self.driver.find_element(By.XPATH, self.open_cart_with_product)
+            cart_icon.click()
+            general_logger.info("Cart Icon Clicked")
+            proceed_to_checkout_button = self.driver.find_element(By.XPATH, self.proceed_to_checkout)
+            proceed_to_checkout_button.click()
+            general_logger.info("Proceed To Checkout Button Clicked")
+            return True
+        except Exception as e:
+            exception_logger.error('Error Proceeding to checkout')
+            return False
     
 # x = SearchProduct
 '''

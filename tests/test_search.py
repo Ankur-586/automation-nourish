@@ -40,7 +40,7 @@ def test_add_product(driver_setup):
 
     # driver.implicitly_wait(10)
     
-    product_name = "ghee".strip().title()  # Use a product name for the test
+    product_name = "Nourish Nutrition Delights Combo of 3".strip().title()  # Use a product name for the test
 
     # Perform search and selection
     assert search_page.open_search_bar() is True, "Failed to open search bar"
@@ -57,7 +57,10 @@ def test_add_product(driver_setup):
     # Get product prices for different weights
     prices = search_page.add_product_to_cart(product_name_from_page)
     assert prices, "Failed to fetch product prices"
-
+    
+    # Click the add to cart button
+    cart_button = search_page.open_cart()
+    assert cart_button, "Failed to Open Cart icon"
     
 
 
