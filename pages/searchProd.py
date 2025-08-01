@@ -178,7 +178,7 @@ class SearchProduct:
         # # Case 5: When Add to cart button doesn't Exist Means Product is out of stock and can't be added to cart
         elif not select_exists and discounted_exists and actual_price_exists and sold_out_prod == "Sold Out":
             general_logger.info(f"{striped_prod_name} is Out of Stock")
-        
+            return 
         else:
             exception_logger.error('Some Weird Error happend')
 
