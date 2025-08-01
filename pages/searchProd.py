@@ -23,6 +23,7 @@ class SearchProduct:
         self.actualPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]'
         self.discountedPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]'
         self.add_to_cart = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button'
+        self.sold_out = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/div/b'
         self.open_cart_with_product = '/html/body/header/nav/div[2]/div/div/div[2]/div[2]'
         self.proceed_to_checkout = '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]'
 
@@ -99,9 +100,9 @@ class SearchProduct:
             
         try:
             actualPrice = self.driver.find_element(By.XPATH, self.actualPrice_product).text
-            actual_exists = True
+            actual_price_exists = True
         except NoSuchElementException:
-            actual_exists = False
+            actual_price_exists = False
             
         try:
             discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
@@ -109,10 +110,11 @@ class SearchProduct:
         except NoSuchElementException:
             discounted_exists = False
         
-        # add_to_cart_button = self.driver.find_element(By.XPATH, self.add_to_cart)
+        sold_out_prod = self.driver.find_element(By.XPATH, self.sold_out).text
+        
         prices = [] 
         
-        # Case 1: When select element exists Along with Discount. Product Example: Arhar/Toor Dal
+        # Case 1: When "select element" exists Along with Discount. Product Example: Arhar/Toor Dal
         if select_exists:
             general_logger.info('Multiple Weights Found With Discounted Price')
             select = Select(select_element)
@@ -130,8 +132,8 @@ class SearchProduct:
             general_logger.info(prices)
             return prices
         
-        # Case 2: When select exists But Discount doesn't. Product Example: Spiral Pasta
-        elif select_exists and not (discounted_exists and actual_exists):
+        # Case 2: When "select element" exists But Discount doesn't. Product Example: Spiral Pasta
+        elif select_exists and not (discounted_exists and actual_price_exists):
             general_logger.info('Multiple Weights Found Without Discounted Price')
             select = Select(select_element)
             for idx in range(0, len(select.options)):
@@ -148,7 +150,7 @@ class SearchProduct:
             return prices
             
         # Case 3: When select does not exists And Also Discount doesn't. Product Example: Moti Elaichi
-        elif not select_exists and not (discounted_exists and actual_exists):
+        elif not select_exists and not (discounted_exists and actual_price_exists):
             general_logger.info('Single Weights Found Without Discounted Price')
             variant_weight = self.driver.find_element(By.XPATH, self.single_weight_nodropdown).text
             actualPrice_withOut_discount = self.driver.find_element(By.XPATH, self.no_discountedPrice).text
@@ -161,7 +163,7 @@ class SearchProduct:
             return prices
         
         # Case 4: When select does not exists But Discount does. Product Example: Rai 
-        elif not select_exists and discounted_exists and actual_exists:
+        elif not select_exists and discounted_exists and actual_price_exists and not sold_out_prod == "Sold Out":
             general_logger.info('Single Weights Found With Discounted Price')
             variant_weight = self.driver.find_element(By.XPATH, self.single_weight_nodropdown)
             prices.append({
@@ -174,8 +176,8 @@ class SearchProduct:
             return prices
         
         # # Case 5: When Add to cart button doesn't Exist Means Product is out of stock and can't be added to cart
-        # elif not select_exists and not (discounted_exists and actual_exists) and not add_to_cart_button:
-        #     general_logger.info(f"{striped_prod_name} is Out of Stock")
+        elif not select_exists and discounted_exists and actual_price_exists and sold_out_prod == "Sold Out":
+            general_logger.info(f"{striped_prod_name} is Out of Stock")
         
         else:
             exception_logger.error('Some Weird Error happend')
@@ -190,7 +192,7 @@ class SearchProduct:
             general_logger.info("Proceed To Checkout Button Clicked")
             return True
         except Exception as e:
-            exception_logger.error('Error Proceeding to checkout')
+            exception_logger.error(f'Error Proceeding to checkout{e}')
             return False
     
 # x = SearchProduct
@@ -205,4 +207,6 @@ def validate_product_page(self, expected_url):
     except Exception as e:
         exception_logger.error(f"Error validating product page: {e}")
     return False
+
+jeera, black salt, rai
 '''

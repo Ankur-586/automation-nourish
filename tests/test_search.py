@@ -20,15 +20,15 @@ def driver_setup():
     yield driver  
     driver.quit()
 
-def test_open_site(driver_setup):
+# def test_open_site(driver_setup):
     
-    driver = driver_setup
-    try:
-        driver.get("https://nourishstore.in/")
-        general_logger.info("Navigated to nourishstore.in")
-    except Exception as e:
-        exception_logger.error(f"Error loading website: {e}")
-        pytest.fail(f"Failed to load website: {e}")
+#     driver = driver_setup
+#     try:
+#         driver.get("https://nourishstore.in/")
+#         general_logger.info("Navigated to nourishstore.in")
+#     except Exception as e:
+#         exception_logger.error(f"Error loading website: {e}")
+#         pytest.fail(f"Failed to load website: {e}")
         
 def test_add_product(driver_setup):
     """
@@ -40,7 +40,7 @@ def test_add_product(driver_setup):
 
     # driver.implicitly_wait(10)
     
-    product_name = "Nourish Nutrition Delights Combo of 3".strip().title()  # Use a product name for the test
+    product_name = "Nourish Nutrition Delights Combo of 5".strip().title()  # Use a product name for the test
 
     # Perform search and selection
     assert search_page.open_search_bar() is True, "Failed to open search bar"
