@@ -15,7 +15,7 @@ def driver_setup():
     yield driver  
     driver.quit()
     
-def test_open_webSite(driver_setup):
+def dont_test_open_webSite(driver_setup):
     driver = driver_setup
     try:
         driver.get("https://nourishstore.in/")

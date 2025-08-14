@@ -20,15 +20,15 @@ def driver_setup():
     yield driver  
     driver.quit()
 
-# def test_open_site(driver_setup):
+def test_open_site(driver_setup):
     
-#     driver = driver_setup
-#     try:
-#         driver.get("https://nourishstore.in/")
-#         general_logger.info("Navigated to nourishstore.in")
-#     except Exception as e:
-#         exception_logger.error(f"Error loading website: {e}")
-#         pytest.fail(f"Failed to load website: {e}")
+    driver = driver_setup
+    try:
+        driver.get("https://nourishstore.in/")
+        general_logger.info("Navigated to nourishstore.in")
+    except Exception as e:
+        exception_logger.error(f"Error loading website: {e}")
+        pytest.fail(f"Failed to load website: {e}")
         
 def test_add_product(driver_setup):
     """

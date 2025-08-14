@@ -66,3 +66,4 @@ class LoginWindow:
         except Exception as e:
             exception_logger.error(f"Unexpected error: {e}")
             return False
+        
