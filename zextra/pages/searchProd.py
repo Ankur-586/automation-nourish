@@ -19,32 +19,39 @@ class SearchProduct:
         self.product_page = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[1]/h1'
         self.multiple_weight_dropdown = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/select'
         self.single_weight_nodropdown = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div/span'
+        self.no_discountedPrice = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span'
         self.actualPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[2]'
         self.discountedPrice_product = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[1]/span/span[1]'
         self.add_to_cart = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/button'
-        # self.open_cart_with_product = ''
+        self.sold_out = '/html/body/main/main/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div[2]/div/b'
+        self.open_cart_with_product = '/html/body/header/nav/div[2]/div/div/div[2]/div[2]'
+        self.proceed_to_checkout = '//*[@id="headlessui-tabs-panel-:R6kt1ja:"]/div[2]/div[3]'
 
+    def wait_for_element(self, by, locator, timeout=10):
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_element_located((by, locator))
+            )
+        except Exception as e:
+            exception_logger.error(f"Element {locator} not found: {e}")
+            return None
+    
     def open_search_bar(self):
         try:
-            search_bar = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, self.search_bar))
-            )
+            search_bar = self.wait_for_element(By.XPATH, self.search_bar)
             search_bar.click()
             general_logger.info("SearchBar clicked successfully")
+            return True
         except Exception as e:
             exception_logger.error(f"Error opening search bar: {e}")
             return False
-        return True
     
     def enter_search_query(self, striped_prod_name):
         try:
-            text_input = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, self.input_box))
-            )
+            text_input = self.wait_for_element(By.XPATH, self.input_box)
             text_input.clear()
             text_input.send_keys(striped_prod_name)
             general_logger.info("Search query entered successfully")
-            time.sleep(1)
             return True
         except Exception as e:
             exception_logger.error(f"Error entering product name in search bar: {e}")
@@ -54,7 +61,7 @@ class SearchProduct:
         try:
             product_elements = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_all_elements_located((By.XPATH, self.product_elements_search_bar))
-        )
+            )
             product_data = set()
             for product_element in product_elements:
                 product_name = product_element.find_element(By.XPATH, self.fetched_product_name).text
@@ -68,7 +75,6 @@ class SearchProduct:
                     self.driver.get(product_url)
                     general_logger.info(f"Clicked on product: {product_name}, ({product_url})")
                     break
-            general_logger.info(f"Fetched product: {sorted_product_list}")
             return product_name
         except Exception as e:
             exception_logger.error(f"Error fetching or clicking on product: {e}")
@@ -84,54 +90,110 @@ class SearchProduct:
             exception_logger.error(f"Error fetching product name from product page: {e}")
             return None
         
-    def add_product_to_cart(self):
+    def add_product_to_cart(self, striped_prod_name):
+        
         try:
             select_element = self.driver.find_element(By.XPATH, self.multiple_weight_dropdown)  
             select_exists = True 
         except NoSuchElementException:
             select_exists = False
+            
         try:
-            prices = [] 
-            if select_exists:
-                general_logger.info('Multiple Weights Found')
-                select = Select(select_element)
-                for idx in range(0, len(select.options)):
-                    opt = select.options[idx]
-                    WebDriverWait(self.driver, 10).until(EC.visibility_of(opt))
-                    select.select_by_index(idx)
-                    print(f'Non-Select: {opt.get_attribute("label")}')
-                    # Extract prices
-                    actualPrice = self.driver.find_element(By.XPATH, self.actualPrice_product).text
-                    discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
-                    prices.append({
-                        f"{opt.get_attribute('label')} actualPrice": actualPrice,
-                        f"{opt.get_attribute('label')} discountedPrice": discountedPrice
-                    })
-                    add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
-                    add_to_cart.click()
-                    general_logger.info('Product Added to cart weight wise')
-                general_logger.info(prices)
-                return prices
-            else:
-                general_logger.info('Single Weight Found')
-                variant_weight = self.driver.find_element(By.XPATH, self.single_weight_nodropdown).text
-                actualPrice = self.driver.find_element(By.XPATH, self.actualPrice_product).text
-                discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
+            actualPrice = self.driver.find_element(By.XPATH, self.actualPrice_product).text
+            actual_price_exists = True
+        except NoSuchElementException:
+            actual_price_exists = False
+            
+        try:
+            discountedPrice = self.driver.find_element(By.XPATH, self.discountedPrice_product).text
+            discounted_exists = True
+        except NoSuchElementException:
+            discounted_exists = False
+        
+        sold_out_prod = self.driver.find_element(By.XPATH, self.sold_out).text
+        
+        prices = [] 
+        
+        # Case 1: When "select element" exists Along with Discount. Product Example: Arhar/Toor Dal
+        if select_exists:
+            general_logger.info('Multiple Weights Found With Discounted Price')
+            select = Select(select_element)
+            for idx in range(0, len(select.options)):
+                opt = select.options[idx]
+                WebDriverWait(self.driver, 10).until(EC.visibility_of(opt))
+                select.select_by_index(idx)
                 prices.append({
-                    f'{variant_weight} Actual Price': actualPrice,
-                    f'{variant_weight} Discounted Price': discountedPrice
+                    f"{opt.get_attribute('label')} actualPrice": actualPrice,
+                    f"{opt.get_attribute('label')} discountedPrice": discountedPrice
                 })
                 add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
                 add_to_cart.click()
-                general_logger.info('Product Added to cart With Single weight')
-                general_logger.info(prices)
-                return prices
-        except Exception as e:
-            exception_logger.error(f"Error fetching product price from product page: {e}")
-            return None
+                general_logger.info(f"{opt.get_attribute('label')} of {striped_prod_name} Added to cart")
+            general_logger.info(prices)
+            return prices
+        
+        # Case 2: When "select element" exists But Discount doesn't. Product Example: Spiral Pasta
+        elif select_exists and not (discounted_exists and actual_price_exists):
+            general_logger.info('Multiple Weights Found Without Discounted Price')
+            select = Select(select_element)
+            for idx in range(0, len(select.options)):
+                opt = select.options[idx]
+                WebDriverWait(self.driver, 10).until(EC.visibility_of(opt))
+                select.select_by_index(idx)
+                actualPrice_withOut_discount = self.driver.find_element(By.XPATH, self.no_discountedPrice).text
+                prices.append({
+                    f"{opt.get_attribute('label')} actualPrice": actualPrice_withOut_discount
+                })
+                add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
+                add_to_cart.click()
+            general_logger.info(f"{opt.get_attribute('label')} of {striped_prod_name} Added to cart")
+            return prices
+            
+        # Case 3: When select does not exists And Also Discount doesn't. Product Example: Moti Elaichi
+        elif not select_exists and not (discounted_exists and actual_price_exists):
+            general_logger.info('Single Weights Found Without Discounted Price')
+            variant_weight = self.driver.find_element(By.XPATH, self.single_weight_nodropdown).text
+            actualPrice_withOut_discount = self.driver.find_element(By.XPATH, self.no_discountedPrice).text
+            prices.append({
+                f"{variant_weight} actualPrice": actualPrice_withOut_discount
+            })
+            add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
+            add_to_cart.click()
+            general_logger.info(f"{variant_weight} of {striped_prod_name} Added to cart")
+            return prices
+        
+        # Case 4: When select does not exists But Discount does. Product Example: Rai 
+        elif not select_exists and discounted_exists and actual_price_exists and not sold_out_prod == "Sold Out":
+            general_logger.info('Single Weights Found With Discounted Price')
+            variant_weight = self.driver.find_element(By.XPATH, self.single_weight_nodropdown)
+            prices.append({
+                f'{variant_weight} Actual Price': actualPrice,
+                f'{variant_weight} Discounted Price': discountedPrice
+            })
+            add_to_cart = self.driver.find_element(By.XPATH, self.add_to_cart)
+            add_to_cart.click()
+            general_logger.info(f"{variant_weight} of {striped_prod_name} Added to cart")
+            return prices
+        
+        # # Case 5: When Add to cart button doesn't Exist Means Product is out of stock and can't be added to cart
+        elif not select_exists and discounted_exists and actual_price_exists and sold_out_prod == "Sold Out":
+            general_logger.info(f"{striped_prod_name} is Out of Stock")
+            return 
+        else:
+            exception_logger.error('Some Weird Error happend')
 
     def open_cart(self):
-        pass
+        try:
+            cart_icon = self.driver.find_element(By.XPATH, self.open_cart_with_product)
+            cart_icon.click()
+            general_logger.info("Cart Icon Clicked")
+            proceed_to_checkout_button = self.driver.find_element(By.XPATH, self.proceed_to_checkout)
+            proceed_to_checkout_button.click()
+            general_logger.info("Proceed To Checkout Button Clicked")
+            return True
+        except Exception as e:
+            exception_logger.error(f'Error Proceeding to checkout{e}')
+            return False
     
 # x = SearchProduct
 '''
@@ -145,4 +207,6 @@ def validate_product_page(self, expected_url):
     except Exception as e:
         exception_logger.error(f"Error validating product page: {e}")
     return False
+
+jeera, black salt, rai
 '''
