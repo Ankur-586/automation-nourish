@@ -10,11 +10,11 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 class LoginWindow:
     def __init__(self, driver):
         self.driver = driver
-        self.loginWindow_id = 'login_button_container' 
-        self.loginpopWindow = '/html/body/header/nav/div[4]/div[2]/div/div/div'
-        self.mobile_input_box = '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/input'
-        self.next_button = '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/button'
-        self.six_input_box = '/html/body/header/nav/div[4]/div[2]/div/div/div/div/div[2]/div/div[2]/form/div[2]'
+        self.loginWindow_class = 'login-box'
+        self.form_field_user_name_id = 'user-name'
+        self.form_field_user_password_id = 'password'
+        self.error_message_container = 'error-message-container'
+        self.submit_button_id = 'login-button'
     
     def wait_for_element(self, by, locator, timeout=10):
         try:
@@ -28,11 +28,10 @@ class LoginWindow:
     def open_login_window(self):
         try:
             login_window = self.wait_for_element(By.ID, self.loginWindow_id)
-            if not login_window:
-                print('not ok')
-            print('ok')
-            # general_logger.info("Login Pop Up Window Click")
-            # return True
+            if login_window:
+                
+            general_logger.info("Login Pop Up Window Click")
+            return True
         except Exception as e:
             exception_logger.error(f"Error opening Login Pop Up Window Click {e}")
             return False
