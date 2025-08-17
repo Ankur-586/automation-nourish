@@ -27,7 +27,7 @@ def dont_test_open_webSite(driver_setup):
         
 def test_openloginWindow(driver_setup):
     driver = driver_setup
-    driver.get("https://nourishstore.in/")
+    driver.get("https://www.saucedemo.com/")
     openLogin_window = LoginWindow(driver)
     
     assert openLogin_window.open_login_window(), "Login window did not open as expected"
